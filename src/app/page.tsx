@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { Star, Eye, Zap, Palette, Github, Loader2, Download } from 'lucide-react';
+import { Star, Eye, Zap, Palette, Github, Loader2, Download, Users, Package, Bug, MessageSquare } from 'lucide-react';
 
 // Import the new components
 import Header from '@/components/Header';
@@ -17,7 +17,10 @@ interface GitHubReleaseAsset {
 interface GitHubRelease {
   tag_name: string;
   assets: GitHubReleaseAsset[];
-  // Add other properties if needed, e.g., 'name', 'body', 'published_at'
+}
+
+interface GitHubContributor {
+  login: string;
 }
 
 // --- Reusable Feature Card Component ---
@@ -42,20 +45,7 @@ const FeatureCard = ({ icon, title, children, gradient }: {
 );
 
 // --- GitHub Star Badge Component ---
-const GitHubBadge = ({ repo }: { repo: string }) => {
-  const [stars, setStars] = useState<number | null>(null);
-
-  useEffect(() => {
-    fetch(`https://api.github.com/repos/${repo}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.stargazers_count) {
-          setStars(data.stargazers_count);
-        }
-      })
-      .catch(e => console.error("Failed to fetch stars", e));
-  }, [repo]);
-
+const GitHubBadge = ({ repo, stars }: { repo: string, stars: number | null }) => {
   const formatStars = (num: number | null) => {
     if (num === null) return '...';
     if (num >= 1000) {
@@ -89,8 +79,11 @@ const GitHubBadge = ({ repo }: { repo: string }) => {
 export default function WalloraLandingPageV2() {
   const [activeImage, setActiveImage] = useState('https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop');
   const [latestRelease, setLatestRelease] = useState<GitHubRelease | null>(null);
-  const [loadingRelease, setLoadingRelease] = useState(true);
-  const [releaseError, setReleaseError] = useState(false);
+  const [contributorsCount, setContributorsCount] = useState<number | null>(null);
+  const [stars, setStars] = useState<number | null>(null);
+  const [openIssues, setOpenIssues] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const wallpapers = [
     { id: 1, src: 'https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop', alt: 'Abstract 3D render' },
@@ -105,23 +98,36 @@ export default function WalloraLandingPageV2() {
   };
 
   useEffect(() => {
-    const fetchLatestRelease = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const [repoData, contributorsData, releaseData] = await Promise.all([
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2').then(res => res.json()),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors').then(res => res.json()),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest').then(res => res.json())
+        ]);
+
+        if (repoData.stargazers_count) {
+          setStars(repoData.stargazers_count);
         }
-        const data: GitHubRelease = await response.json();
-        setLatestRelease(data);
-      } catch (error) {
-        console.error("Failed to fetch latest release from GitHub:", error);
-        setReleaseError(true);
+        if (repoData.open_issues_count) {
+          setOpenIssues(repoData.open_issues_count);
+        }
+        if (Array.isArray(contributorsData)) {
+          setContributorsCount(contributorsData.length);
+        }
+        if (releaseData.tag_name) {
+          setLatestRelease(releaseData);
+        }
+
+      } catch (e) {
+        console.error("Failed to fetch GitHub data", e);
+        setError(true);
       } finally {
-        setLoadingRelease(false);
+        setLoading(false);
       }
     };
 
-    fetchLatestRelease();
+    fetchData();
   }, []);
 
   const getApkDownloadUrl = () => {
@@ -150,41 +156,58 @@ export default function WalloraLandingPageV2() {
         {/* --- Hero Section --- */}
         <section className="relative text-center py-28 md:py-40 px-6">
           <div className="relative z-10 container mx-auto flex flex-col items-center">
-            <GitHubBadge repo="HexaGhost-09/wallora-2" />
+            {/* Badges container */}
+            <div className="flex flex-wrap justify-center items-center gap-2 mb-4">
+              <GitHubBadge repo="HexaGhost-09/wallora-2" stars={stars} />
+
+              {/* Contributors Badge */}
+              <a
+                href="https://github.com/HexaGhost-09/wallora-2/graphs/contributors"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+              >
+                <Users size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">Contributors</span>
+                  <div className="h-5 w-px bg-white/30"></div>
+                  <span className="font-bold text-white">
+                    {contributorsCount !== null ? contributorsCount : '...'}
+                  </span>
+                </div>
+              </a>
+
+              {/* Release Version Badge */}
+              <a
+                href="https://github.com/HexaGhost-09/wallora-2/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+              >
+                <Package size={18} className="text-white" />
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-white">Version</span>
+                  <div className="h-5 w-px bg-white/30"></div>
+                  <span className="font-bold text-white">
+                    {latestRelease?.tag_name ? latestRelease.tag_name.replace('v', '') : '...'}
+                  </span>
+                </div>
+              </a>
+            </div>
+
             <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter mt-6 mb-4 bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">
               Your Screen, Reimagined.
             </h2>
             <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-300 mb-8">
               Step into a universe of breathtaking wallpapers. Wallora brings you exclusive, high-quality backgrounds to make your device truly yours.
             </p>
-            {/* Download button moved here */}
-            <div className="flex justify-center items-center flex-wrap gap-4">
-              {loadingRelease ? (
-                <div className="bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3">
-                  <Loader2 size={20} className="animate-spin" />
-                  <span>Fetching latest release...</span>
-                </div>
-              ) : releaseError ? (
-                <a
-                  href="https://github.com/HexaGhost-09/wallora-2/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-red-800 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center gap-3 transform hover:scale-105 border border-white/20"
-                >
-                  <span>Error fetching release. Click here for GitHub Releases.</span>
-                </a>
-              ) : (
-                <a
-                  href={getApkDownloadUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-fuchsia-500/30 flex items-center gap-3"
-                >
-                  <Download size={20} />
-                  <span>Download APK {latestRelease?.tag_name ? `(${latestRelease.tag_name})` : ''}</span>
-                </a>
-              )}
-            </div>
+            <a
+              href="#download"
+              className="bg-white text-black font-semibold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:bg-neutral-200 flex items-center space-x-2"
+            >
+              <Download size={18} />
+              <span>Download Now</span>
+            </a>
           </div>
         </section>
 
@@ -251,21 +274,20 @@ export default function WalloraLandingPageV2() {
           </div>
         </section>
 
-        {/* --- Download CTA Section (kept for consistency with the original structure, but the primary download button is now in Hero) --- */}
+        {/* --- Download CTA Section --- */}
         <section id="download" className="py-20 px-6 text-center">
           <div className="container mx-auto p-10 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10">
             <h3 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Ready to Elevate Your Screen?</h3>
             <p className="max-w-xl mx-auto text-neutral-400 mb-8">
               Download Wallora today and join thousands of users enjoying a more beautiful device.
             </p>
-            {/* This section now serves as a secondary download prompt, or can be removed if desired */}
             <div className="flex justify-center items-center flex-wrap gap-4">
-              {loadingRelease ? (
+              {loading ? (
                 <div className="bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3">
                   <Loader2 size={20} className="animate-spin" />
                   <span>Fetching latest release...</span>
                 </div>
-              ) : releaseError ? (
+              ) : error ? (
                 <a
                   href="https://github.com/HexaGhost-09/wallora-2/releases"
                   target="_blank"
@@ -288,6 +310,37 @@ export default function WalloraLandingPageV2() {
             </div>
           </div>
         </section>
+
+        {/* --- Feedback Section --- */}
+        <div className="py-12 px-6">
+          <div className="container mx-auto text-center">
+            <h4 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">We'd Love to Hear From You</h4>
+            <p className="max-w-2xl mx-auto text-neutral-400 mb-8">Your feedback helps us make Wallora even better. Have an idea, a feature request, or found a bug?</p>
+            <div className="flex justify-center items-center flex-wrap gap-4">
+              {/* Feedback Badge */}
+              <a
+                href="https://github.com/HexaGhost-09/wallora-2/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+              >
+                <MessageSquare size={18} className="text-white" />
+                <span className="font-semibold text-white">Share a Suggestion</span>
+              </a>
+
+              {/* Bug Report Badge */}
+              <a
+                href="https://github.com/HexaGhost-09/wallora-2/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+              >
+                <Bug size={18} className="text-white" />
+                <span className="font-semibold text-white">Report a Bug</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </main>
 
       <Footer />
