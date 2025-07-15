@@ -1,8 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Download, Star, Eye, Zap, Palette, Github, Loader2 } from 'lucide-react';
 import React from 'react';
+import { Star, Eye, Zap, Palette, Github, Loader2, Download } from 'lucide-react';
+
+// Import the new components
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 
 // Define TypeScript interfaces for GitHub Release data
 interface GitHubReleaseAsset {
@@ -13,15 +17,14 @@ interface GitHubReleaseAsset {
 interface GitHubRelease {
   tag_name: string;
   assets: GitHubReleaseAsset[];
-  // Add other properties if needed, e.g., 'name', 'body', 'published_at'
 }
 
 // --- Reusable Feature Card Component ---
-const FeatureCard = ({ icon, title, children, gradient }: { 
-  icon: React.ReactNode, 
-  title: string, 
-  children: React.ReactNode, 
-  gradient: string 
+const FeatureCard = ({ icon, title, children, gradient }: {
+  icon: React.ReactNode,
+  title: string,
+  children: React.ReactNode,
+  gradient: string
 }) => (
   <div className="relative p-8 overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
     <div className="absolute top-0 left-0 -z-10 w-full h-full opacity-20">
@@ -42,7 +45,6 @@ const GitHubBadge = ({ repo }: { repo: string }) => {
   const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
-    // Fetches star count from GitHub API
     fetch(`https://api.github.com/repos/${repo}`)
       .then(res => res.json())
       .then(data => {
@@ -85,7 +87,7 @@ const GitHubBadge = ({ repo }: { repo: string }) => {
 // --- Main Page Component ---
 export default function WalloraLandingPageV2() {
   const [activeImage, setActiveImage] = useState('https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop');
-  const [latestRelease, setLatestRelease] = useState<GitHubRelease | null>(null); // Fixed: Explicit type
+  const [latestRelease, setLatestRelease] = useState<GitHubRelease | null>(null);
   const [loadingRelease, setLoadingRelease] = useState(true);
   const [releaseError, setReleaseError] = useState(false);
 
@@ -96,45 +98,39 @@ export default function WalloraLandingPageV2() {
     { id: 4, src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop', alt: 'Blue and pink abstract shapes' },
   ];
 
-  // Function to handle image loading errors, replacing with a placeholder
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = `https://placehold.co/300x650/0a0a0a/ffffff?text=Wallora`;
-    e.currentTarget.onerror = null; // Prevent infinite loop if placeholder also fails
+    e.currentTarget.onerror = null;
   };
 
-  // Effect to fetch latest release data from the GitHub API
   useEffect(() => {
     const fetchLatestRelease = async () => {
       try {
-        // Using GitHub's official API for latest release
         const response = await fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data: GitHubRelease = await response.json(); // Cast to GitHubRelease
+        const data: GitHubRelease = await response.json();
         setLatestRelease(data);
       } catch (error) {
         console.error("Failed to fetch latest release from GitHub:", error);
-        setReleaseError(true); // Set error state
+        setReleaseError(true);
       } finally {
-        setLoadingRelease(false); // Always set loading to false when done
+        setLoadingRelease(false);
       }
     };
 
     fetchLatestRelease();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Determine the correct APK download URL from GitHub release assets
   const getApkDownloadUrl = () => {
     if (latestRelease && latestRelease.assets) {
-      // Look for an asset with "apk" in its name, prioritizing "app-release.apk"
       const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
       if (generalApk) return generalApk.browser_download_url;
 
       const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
       if (anyApk) return anyApk.browser_download_url;
     }
-    // Fallback to the main releases page if no specific APK is found or API fails
     return 'https://github.com/HexaGhost-09/wallora-2/releases';
   };
 
@@ -147,19 +143,7 @@ export default function WalloraLandingPageV2() {
         <div className="absolute top-1/4 left-1/4 w-[60vw] h-[60vh] bg-cyan-600/20 rounded-full blur-3xl animate-pulse-slow animation-delay-2000"></div>
       </div>
 
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-lg">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center border-b border-white/10">
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Wallora</h1>
-          <a
-            href="#download"
-            className="bg-white text-black font-semibold py-2 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 hover:bg-neutral-200 flex items-center space-x-2"
-          >
-            <Download size={18} />
-            <span>Download</span>
-          </a>
-        </div>
-      </header>
+      <Header />
 
       <main className="pt-24">
         {/* --- Hero Section --- */}
@@ -229,7 +213,6 @@ export default function WalloraLandingPageV2() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard icon={<Star size={30} />} title="Exclusive Collections" gradient="bg-gradient-to-br from-fuchsia-500 to-purple-600">
-                {/* Fixed: Using string literal for apostrophe */}
                 {"Hand-picked and AI-generated wallpapers you won't find anywhere else."}
               </FeatureCard>
               <FeatureCard icon={<Eye size={30} />} title="4K & HD Quality" gradient="bg-gradient-to-br from-cyan-500 to-blue-600">
@@ -260,7 +243,7 @@ export default function WalloraLandingPageV2() {
                 </div>
               ) : releaseError ? (
                 <a
-                  href="https://github.com/HexaGhost-09/wallora-2/releases" // Fallback to main releases page on error
+                  href="https://github.com/HexaGhost-09/wallora-2/releases"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-red-800 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center gap-3 transform hover:scale-105 border border-white/20"
@@ -283,14 +266,7 @@ export default function WalloraLandingPageV2() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 mt-20 py-8 px-6">
-        <div className="container mx-auto text-center text-neutral-500">
-          <p>&copy; {new Date().getFullYear()} Wallora. All rights reserved.</p>
-          {/* This comment line (277) is where the error was reported, but the fix is in the FeatureCard content */}
-       <p className="text-sm mt-2">Designed by <a href="https://github.com/HexaGhost-09" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">HexaGhost</a> to make your screen shine.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
