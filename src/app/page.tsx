@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Download, Star, Eye, Zap, Palette, Github, Loader2 } from 'lucide-react'; // Added Loader2 for loading state
+import { Download, Star, Eye, Zap, Palette, Github, Loader2 } from 'lucide-react';
 
 // --- Reusable Feature Card Component ---
 const FeatureCard = ({ icon, title, children, gradient }) => (
@@ -268,6 +268,7 @@ export default function WalloraLandingPageV2() {
       <footer className="border-t border-white/10 mt-20 py-8 px-6">
         <div className="container mx-auto text-center text-neutral-500">
           <p>&copy; {new Date().getFullYear()} Wallora. All rights reserved.</p>
+          {/* Fixed the href attribute to remove the newline character */}
           <p className="text-sm mt-2">Designed by <a href="https://github.com/HexaGhost-09" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">HexaGhost</a> to make your screen shine.</p>
         </div>
       </footer>
