@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 
 // Import all the components for each section of the page
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+// Note: Header and Footer are now in layout.tsx, so they are not needed here.
 import IntroSection from '@/components/IntroSection';
 import MobileShowcaseSection from '@/components/MobileShowcaseSection';
 import WhyWalloraSection from '@/components/WhyWalloraSection';
@@ -32,7 +31,7 @@ interface GitHubData {
   error: boolean;
 }
 
-export default function WalloraLandingPageV2() {
+export default function HomePage() {
   const [githubData, setGithubData] = useState<GitHubData>({
     stars: null,
     contributorsCount: null,
@@ -75,37 +74,23 @@ export default function WalloraLandingPageV2() {
   }, []);
 
   return (
-    <div className="bg-black text-white font-sans overflow-x-hidden">
-      {/* Animated Gradient Background */}
-      <div className="fixed top-0 left-0 w-full h-full -z-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-black"></div>
-        <div className="absolute top-1/2 left-1/2 w-[80vw] h-[80vh] bg-fuchsia-600/20 rounded-full blur-3xl animate-pulse-slow"></div>
-        <div className="absolute top-1/4 left-1/4 w-[60vw] h-[60vh] bg-cyan-600/20 rounded-full blur-3xl animate-pulse-slow animation-delay-2000"></div>
-      </div>
+    <>
+      <IntroSection
+        stars={githubData.stars}
+        contributorsCount={githubData.contributorsCount}
+        latestRelease={githubData.latestRelease}
+      />
+      <MobileShowcaseSection />
 
-      <Header />
+      <ContributorsSection />
 
-      <main className="pt-24">
-        <IntroSection
-          stars={githubData.stars}
-          contributorsCount={githubData.contributorsCount}
-          latestRelease={githubData.latestRelease}
-        />
-        <MobileShowcaseSection />
-
-        {/* The new position for the Contributors section */}
-        <ContributorsSection />
-
-        <WhyWalloraSection />
-        <DownloadSection
-          latestRelease={githubData.latestRelease}
-          loading={githubData.loading}
-          error={githubData.error}
-        />
-        <FeedbackSection />
-      </main>
-
-      <Footer />
-    </div>
+      <WhyWalloraSection />
+      <DownloadSection
+        latestRelease={githubData.latestRelease}
+        loading={githubData.loading}
+        error={githubData.error}
+      />
+      <FeedbackSection />
+    </>
   );
 }
