@@ -211,7 +211,7 @@ export default function WalloraLandingPageV2() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard icon={<Star size={30} />} title="Exclusive Collections" gradient="bg-gradient-to-br from-fuchsia-500 to-purple-600">
-                Hand-picked and AI-generated wallpapers you won't find anywhere else.
+                Hand-picked and AI-generated wallpapers you won&apos;t find anywhere else.
               </FeatureCard>
               <FeatureCard icon={<Eye size={30} />} title="4K & HD Quality" gradient="bg-gradient-to-br from-cyan-500 to-blue-600">
                 Crystal clear, high-resolution wallpapers that look stunning on any screen.
@@ -269,7 +269,8 @@ export default function WalloraLandingPageV2() {
         <div className="container mx-auto text-center text-neutral-500">
           <p>&copy; {new Date().getFullYear()} Wallora. All rights reserved.</p>
           {/* Fixed the unescaped apostrophe */}
-          <p className="text-sm mt-2">Designed by <a href="https://github.com/HexaGhost-09" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">HexaGhost</a> to make your screen shine.</p>
+
+       <p className="text-sm mt-2">Designed by <a href="https://github.com/HexaGhost-09" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">HexaGhost</a> to make your screen shine.</p>
         </div>
       </footer>
     </div>
