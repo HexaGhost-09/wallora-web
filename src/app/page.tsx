@@ -4,6 +4,18 @@ import { useState, useEffect } from 'react';
 import { Download, Star, Eye, Zap, Palette, Github, Loader2 } from 'lucide-react';
 import React from 'react';
 
+// Define TypeScript interfaces for GitHub Release data
+interface GitHubReleaseAsset {
+  name: string;
+  browser_download_url: string;
+}
+
+interface GitHubRelease {
+  tag_name: string;
+  assets: GitHubReleaseAsset[];
+  // Add other properties if needed, e.g., 'name', 'body', 'published_at'
+}
+
 // --- Reusable Feature Card Component ---
 const FeatureCard = ({ icon, title, children, gradient }: { 
   icon: React.ReactNode, 
@@ -73,7 +85,7 @@ const GitHubBadge = ({ repo }: { repo: string }) => {
 // --- Main Page Component ---
 export default function WalloraLandingPageV2() {
   const [activeImage, setActiveImage] = useState('https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop');
-  const [latestRelease, setLatestRelease] = useState<any>(null);
+  const [latestRelease, setLatestRelease] = useState<GitHubRelease | null>(null); // Fixed: Explicit type
   const [loadingRelease, setLoadingRelease] = useState(true);
   const [releaseError, setReleaseError] = useState(false);
 
@@ -99,7 +111,7 @@ export default function WalloraLandingPageV2() {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+        const data: GitHubRelease = await response.json(); // Cast to GitHubRelease
         setLatestRelease(data);
       } catch (error) {
         console.error("Failed to fetch latest release from GitHub:", error);
@@ -116,10 +128,10 @@ export default function WalloraLandingPageV2() {
   const getApkDownloadUrl = () => {
     if (latestRelease && latestRelease.assets) {
       // Look for an asset with "apk" in its name, prioritizing "app-release.apk"
-      const generalApk = latestRelease.assets.find((asset: { name: string; }) => asset.name.includes('app-release.apk'));
+      const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
       if (generalApk) return generalApk.browser_download_url;
 
-      const anyApk = latestRelease.assets.find((asset: { name: string; }) => asset.name.includes('.apk'));
+      const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
       if (anyApk) return anyApk.browser_download_url;
     }
     // Fallback to the main releases page if no specific APK is found or API fails
@@ -217,7 +229,8 @@ export default function WalloraLandingPageV2() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard icon={<Star size={30} />} title="Exclusive Collections" gradient="bg-gradient-to-br from-fuchsia-500 to-purple-600">
-                Hand-picked and AI-generated wallpapers you won't find anywhere else.
+                {/* Fixed: Using string literal for apostrophe */}
+                {"Hand-picked and AI-generated wallpapers you won't find anywhere else."}
               </FeatureCard>
               <FeatureCard icon={<Eye size={30} />} title="4K & HD Quality" gradient="bg-gradient-to-br from-cyan-500 to-blue-600">
                 Crystal clear, high-resolution wallpapers that look stunning on any screen.
@@ -274,8 +287,7 @@ export default function WalloraLandingPageV2() {
       <footer className="border-t border-white/10 mt-20 py-8 px-6">
         <div className="container mx-auto text-center text-neutral-500">
           <p>&copy; {new Date().getFullYear()} Wallora. All rights reserved.</p>
-          {/* Fixed the unescaped apostrophe */}
-
+          {/* This comment line (277) is where the error was reported, but the fix is in the FeatureCard content */}
        <p className="text-sm mt-2">Designed by <a href="https://github.com/HexaGhost-09" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">HexaGhost</a> to make your screen shine.</p>
         </div>
       </footer>
