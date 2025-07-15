@@ -1,10 +1,10 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+/*
+ * Corrected Tailwind CSS import.
+ * This single line now imports all of Tailwind's layers (base, components, and utilities)
+ */
+@import "tailwindcss";
 
-/* This is where you can define global CSS variables and rules. */
 :root {
-  /* You can use these for a future light theme if you want to implement one */
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -16,15 +16,11 @@
   }
 }
 
-/* The body font is now handled automatically by the Inter font class in layout.tsx.
-   Do not set font-family here, or it will override the optimized font. */
 body {
-  /* Using Tailwind classes for the main page colors for simplicity,
-     but you could use the CSS variables defined above if you prefer. */
+  /* The font family is handled by the Geist or Inter font classes in layout.tsx. */
 }
 
-/* You can add custom styles for markdown content here.
-   These styles are applied in the ReleasesPage component. */
+/* Custom styles for the prose content in the releases page */
 .prose {
   color: var(--foreground);
 }
