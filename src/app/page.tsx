@@ -17,6 +17,7 @@ interface GitHubReleaseAsset {
 interface GitHubRelease {
   tag_name: string;
   assets: GitHubReleaseAsset[];
+  // Add other properties if needed, e.g., 'name', 'body', 'published_at'
 }
 
 // --- Reusable Feature Card Component ---
@@ -156,12 +157,34 @@ export default function WalloraLandingPageV2() {
             <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-300 mb-8">
               Step into a universe of breathtaking wallpapers. Wallora brings you exclusive, high-quality backgrounds to make your device truly yours.
             </p>
-            <a
-              href="#download"
-              className="bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-fuchsia-500/30"
-            >
-              Get The App
-            </a>
+            {/* Download button moved here */}
+            <div className="flex justify-center items-center flex-wrap gap-4">
+              {loadingRelease ? (
+                <div className="bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3">
+                  <Loader2 size={20} className="animate-spin" />
+                  <span>Fetching latest release...</span>
+                </div>
+              ) : releaseError ? (
+                <a
+                  href="https://github.com/HexaGhost-09/wallora-2/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-red-800 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center gap-3 transform hover:scale-105 border border-white/20"
+                >
+                  <span>Error fetching release. Click here for GitHub Releases.</span>
+                </a>
+              ) : (
+                <a
+                  href={getApkDownloadUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white font-bold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-fuchsia-500/30 flex items-center gap-3"
+                >
+                  <Download size={20} />
+                  <span>Download APK {latestRelease?.tag_name ? `(${latestRelease.tag_name})` : ''}</span>
+                </a>
+              )}
+            </div>
           </div>
         </section>
 
@@ -228,13 +251,14 @@ export default function WalloraLandingPageV2() {
           </div>
         </section>
 
-        {/* --- Download CTA Section --- */}
+        {/* --- Download CTA Section (kept for consistency with the original structure, but the primary download button is now in Hero) --- */}
         <section id="download" className="py-20 px-6 text-center">
           <div className="container mx-auto p-10 rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10">
             <h3 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Ready to Elevate Your Screen?</h3>
             <p className="max-w-xl mx-auto text-neutral-400 mb-8">
               Download Wallora today and join thousands of users enjoying a more beautiful device.
             </p>
+            {/* This section now serves as a secondary download prompt, or can be removed if desired */}
             <div className="flex justify-center items-center flex-wrap gap-4">
               {loadingRelease ? (
                 <div className="bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3">
