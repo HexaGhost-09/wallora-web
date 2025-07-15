@@ -1,7 +1,7 @@
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, Bug, MessageSquare, List } from 'lucide-react';
 import React from 'react';
 
-// Define TypeScript interfaces
+// Define TypeScript interfaces (ensure these are consistent with WalloraLandingPageV2.tsx)
 interface GitHubReleaseAsset {
   name: string;
   browser_download_url: string;
@@ -36,7 +36,9 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
         <p className="max-w-xl mx-auto text-neutral-400 mb-8">
           Download Wallora today and join thousands of users enjoying a more beautiful device.
         </p>
-        <div className="flex justify-center items-center flex-wrap gap-4">
+
+        {/* Change the container to flex-col for a vertical button stack */}
+        <div className="flex flex-col justify-center items-center gap-4">
           {loading ? (
             <div className="bg-neutral-800 text-white font-semibold py-3 px-6 rounded-lg flex items-center gap-3">
               <Loader2 size={20} className="animate-spin" />
@@ -62,6 +64,17 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
               <span>Download APK {latestRelease?.tag_name ? `(${latestRelease.tag_name})` : ''}</span>
             </a>
           )}
+
+          {/* New "Releases Page" button below the main download button */}
+          <a
+            href="https://github.com/HexaGhost-09/wallora-2/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 py-2 px-6 rounded-lg transition-all duration-300 hover:bg-white/10 transform hover:scale-105 border border-white/20"
+          >
+            <List size={20} />
+            <span>Releases Page</span>
+          </a>
         </div>
       </div>
     </section>

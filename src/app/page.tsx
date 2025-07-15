@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import React from 'react';
+
+// Import all the components for each section of the page
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import IntroSection from '@/components/IntroSection';
@@ -9,8 +11,9 @@ import MobileShowcaseSection from '@/components/MobileShowcaseSection';
 import WhyWalloraSection from '@/components/WhyWalloraSection';
 import DownloadSection from '@/components/DownloadSection';
 import FeedbackSection from '@/components/FeedbackSection';
+import ContributorsSection from '@/components/ContributorsSection';
 
-// Define TypeScript interfaces
+// Define TypeScript interfaces (ideally in a separate file)
 interface GitHubReleaseAsset {
   name: string;
   browser_download_url: string;
@@ -41,11 +44,19 @@ export default function WalloraLandingPageV2() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [repoData, contributorsData, releaseData] = await Promise.all([
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2').then(res => res.json()),
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors').then(res => res.json()),
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest').then(res => res.json())
+        const [repoResponse, contributorsResponse, releaseResponse] = await Promise.all([
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2'),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors'),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest')
         ]);
+
+        if (!repoResponse.ok || !contributorsResponse.ok || !releaseResponse.ok) {
+          throw new Error('One or more GitHub API requests failed');
+        }
+
+        const repoData = await repoResponse.json();
+        const contributorsData = await contributorsResponse.json();
+        const releaseData = await releaseResponse.json();
 
         setGithubData({
           stars: repoData.stargazers_count || null,
@@ -55,7 +66,7 @@ export default function WalloraLandingPageV2() {
           error: false
         });
       } catch (e) {
-        console.error("Failed to fetch GitHub data", e);
+        console.error("Failed to fetch GitHub data:", e);
         setGithubData(prev => ({ ...prev, loading: false, error: true }));
       }
     };
@@ -75,8 +86,16 @@ export default function WalloraLandingPageV2() {
       <Header />
 
       <main className="pt-24">
-        <IntroSection stars={githubData.stars} contributorsCount={githubData.contributorsCount} />
+        <IntroSection
+          stars={githubData.stars}
+          contributorsCount={githubData.contributorsCount}
+          latestRelease={githubData.latestRelease}
+        />
         <MobileShowcaseSection />
+
+        {/* The new position for the Contributors section */}
+        <ContributorsSection />
+
         <WhyWalloraSection />
         <DownloadSection
           latestRelease={githubData.latestRelease}
