@@ -2,9 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import { Download, Star, Eye, Zap, Palette, Github, Loader2 } from 'lucide-react';
+import React from 'react';
 
 // --- Reusable Feature Card Component ---
-const FeatureCard = ({ icon, title, children, gradient }) => (
+const FeatureCard = ({ icon, title, children, gradient }: { 
+  icon: React.ReactNode, 
+  title: string, 
+  children: React.ReactNode, 
+  gradient: string 
+}) => (
   <div className="relative p-8 overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg transform transition-all duration-500 hover:scale-105 hover:shadow-2xl">
     <div className="absolute top-0 left-0 -z-10 w-full h-full opacity-20">
       <div className={`absolute w-48 h-48 rounded-full -top-12 -left-12 ${gradient} blur-3xl`}></div>
@@ -20,8 +26,8 @@ const FeatureCard = ({ icon, title, children, gradient }) => (
 );
 
 // --- GitHub Star Badge Component ---
-const GitHubBadge = ({ repo }) => {
-  const [stars, setStars] = useState(null);
+const GitHubBadge = ({ repo }: { repo: string }) => {
+  const [stars, setStars] = useState<number | null>(null);
 
   useEffect(() => {
     // Fetches star count from GitHub API
@@ -35,7 +41,7 @@ const GitHubBadge = ({ repo }) => {
       .catch(e => console.error("Failed to fetch stars", e));
   }, [repo]);
 
-  const formatStars = (num) => {
+  const formatStars = (num: number | null) => {
     if (num === null) return '...';
     if (num >= 1000) {
       return (num / 1000).toFixed(1) + 'k';
@@ -67,7 +73,7 @@ const GitHubBadge = ({ repo }) => {
 // --- Main Page Component ---
 export default function WalloraLandingPageV2() {
   const [activeImage, setActiveImage] = useState('https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop');
-  const [latestRelease, setLatestRelease] = useState(null);
+  const [latestRelease, setLatestRelease] = useState<any>(null);
   const [loadingRelease, setLoadingRelease] = useState(true);
   const [releaseError, setReleaseError] = useState(false);
 
@@ -79,9 +85,9 @@ export default function WalloraLandingPageV2() {
   ];
 
   // Function to handle image loading errors, replacing with a placeholder
-  const handleImageError = (e) => {
-    e.target.src = `https://placehold.co/300x650/0a0a0a/ffffff?text=Wallora`;
-    e.target.onerror = null; // Prevent infinite loop if placeholder also fails
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = `https://placehold.co/300x650/0a0a0a/ffffff?text=Wallora`;
+    e.currentTarget.onerror = null; // Prevent infinite loop if placeholder also fails
   };
 
   // Effect to fetch latest release data from the GitHub API
@@ -110,10 +116,10 @@ export default function WalloraLandingPageV2() {
   const getApkDownloadUrl = () => {
     if (latestRelease && latestRelease.assets) {
       // Look for an asset with "apk" in its name, prioritizing "app-release.apk"
-      const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
+      const generalApk = latestRelease.assets.find((asset: { name: string; }) => asset.name.includes('app-release.apk'));
       if (generalApk) return generalApk.browser_download_url;
 
-      const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
+      const anyApk = latestRelease.assets.find((asset: { name: string; }) => asset.name.includes('.apk'));
       if (anyApk) return anyApk.browser_download_url;
     }
     // Fallback to the main releases page if no specific APK is found or API fails
@@ -211,7 +217,7 @@ export default function WalloraLandingPageV2() {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <FeatureCard icon={<Star size={30} />} title="Exclusive Collections" gradient="bg-gradient-to-br from-fuchsia-500 to-purple-600">
-                Hand-picked and AI-generated wallpapers you won&apos;t find anywhere else.
+                Hand-picked and AI-generated wallpapers you won't find anywhere else.
               </FeatureCard>
               <FeatureCard icon={<Eye size={30} />} title="4K & HD Quality" gradient="bg-gradient-to-br from-cyan-500 to-blue-600">
                 Crystal clear, high-resolution wallpapers that look stunning on any screen.
