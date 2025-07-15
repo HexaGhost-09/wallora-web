@@ -314,7 +314,7 @@ export default function WalloraLandingPageV2() {
         {/* --- Feedback Section --- */}
         <div className="py-12 px-6">
           <div className="container mx-auto text-center">
-            <h4 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">We'd Love to Hear From You</h4>
+            <h4 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">We&apos;d Love to Hear From You</h4>
             <p className="max-w-2xl mx-auto text-neutral-400 mb-8">Your feedback helps us make Wallora even better. Have an idea, a feature request, or found a bug?</p>
             <div className="flex justify-center items-center flex-wrap gap-4">
               {/* Feedback Badge */}
