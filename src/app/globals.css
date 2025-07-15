@@ -1,15 +1,12 @@
-@import "tailwindcss";
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
+/* This is where you can define global CSS variables and rules. */
 :root {
+  /* You can use these for a future light theme if you want to implement one */
   --background: #ffffff;
   --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +16,35 @@
   }
 }
 
+/* The body font is now handled automatically by the Inter font class in layout.tsx.
+   Do not set font-family here, or it will override the optimized font. */
 body {
-  background: var(--background);
+  /* Using Tailwind classes for the main page colors for simplicity,
+     but you could use the CSS variables defined above if you prefer. */
+}
+
+/* You can add custom styles for markdown content here.
+   These styles are applied in the ReleasesPage component. */
+.prose {
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: #ffffff;
+}
+
+.prose p,
+.prose ul,
+.prose ol {
+  line-height: 1.6;
+}
+
+.prose a {
+  color: #0ea5e9; /* Tailwind's sky-500 */
+  text-decoration: underline;
 }
