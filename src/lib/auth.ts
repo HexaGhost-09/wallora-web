@@ -21,6 +21,9 @@ export async function decrypt(input: string): Promise<any> {
 }
 
 export async function login(adminSecret: string) {
+  console.log("Login attempt with secret length:", adminSecret.length);
+  console.log("Expected secret length from ENV:", process.env.ADMIN_SECRET?.length || 0);
+
   if (adminSecret !== process.env.ADMIN_SECRET) {
     return false;
   }

@@ -24,8 +24,13 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isMounted, setIsMounted] = useState(false);
   const [stats, setStats] = useState({
-    visits: 0,
-    downloads: 0,
+    totalVisits: 0,
+    totalDownloads: 0,
+    dailyVisits: 0,
+    dailyDownloads: 0,
+    monthlyVisits: 0,
+    monthlyDownloads: 0,
+    liveUsers: 0,
     admins: 0,
     recentLogs: [] as any[]
   });
@@ -142,10 +147,27 @@ export default function AdminDashboard() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-4 gap-6">
                   {[
-                    { label: "Active Admins", value: stats.admins.toString(), icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
-                    { label: "Total Visits", value: stats.visits.toString(), icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
-                    { label: "APK Downloads", value: stats.downloads.toString(), icon: Zap, color: "text-orange-400", bg: "bg-orange-500/10" },
-                    { label: "System Health", value: "Optimal", icon: Shield, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+                    { label: "Live Users", value: stats.liveUsers.toString(), icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
+                    { label: "Daily Visits", value: stats.dailyVisits.toString(), icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
+                    { label: "Monthly Visits", value: stats.monthlyVisits.toString(), icon: Activity, color: "text-cyan-400", bg: "bg-cyan-500/10" },
+                    { label: "Total Visits", value: stats.totalVisits.toString(), icon: Database, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-zinc-900 border border-white/5 p-6 rounded-3xl group hover:border-white/10 transition-colors">
+                      <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                        <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                      </div>
+                      <p className="text-zinc-500 text-sm font-medium">{stat.label}</p>
+                      <p className="text-3xl font-bold mt-1">{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-4 gap-6">
+                  {[
+                    { label: "Daily APK", value: stats.dailyDownloads.toString(), icon: Zap, color: "text-orange-400", bg: "bg-orange-500/10" },
+                    { label: "Monthly APK", value: stats.monthlyDownloads.toString(), icon: Zap, color: "text-yellow-400", bg: "bg-yellow-500/10" },
+                    { label: "Total APK", value: stats.totalDownloads.toString(), icon: Zap, color: "text-red-400", bg: "bg-red-500/10" },
+                    { label: "Admins", value: stats.admins.toString(), icon: Shield, color: "text-violet-400", bg: "bg-violet-500/10" },
                   ].map((stat, i) => (
                     <div key={i} className="bg-zinc-900 border border-white/5 p-6 rounded-3xl group hover:border-white/10 transition-colors">
                       <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
@@ -204,7 +226,40 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {activeTab !== "overview" && (
+            {activeTab === "logs" && (
+              <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                <h3 className="text-xl font-bold mb-8">Full System Audit Logs</h3>
+                <div className="space-y-4">
+                  {stats.recentLogs.map((log, i) => (
+                    <div key={i} className="flex items-center justify-between p-4 bg-black/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all">
+                      <div className="flex items-center space-x-4">
+                        <Terminal className="w-4 h-4 text-indigo-400" />
+                        <div>
+                          <p className="font-medium">{log.action}</p>
+                          <p className="text-sm text-zinc-500">{log.details}</p>
+                        </div>
+                      </div>
+                      <span className="text-sm text-zinc-600">
+                        {new Date(log.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "database" && (
+              <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8 text-center py-20">
+                <Database className="w-16 h-16 text-indigo-500 mx-auto mb-6 opacity-30" />
+                <h3 className="text-2xl font-bold mb-4">APK Management Ready</h3>
+                <p className="text-zinc-400 mb-8 max-w-md mx-auto">Upload new APK versions and monitor download URLs directly from here.</p>
+                <div className="inline-flex items-center px-4 py-2 bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-xl text-sm font-bold">
+                   Feature Provisioned
+                </div>
+              </div>
+            )}
+
+            {activeTab !== "overview" && activeTab !== "logs" && activeTab !== "database" && (
               <div className="flex flex-col items-center justify-center h-[60vh] text-zinc-500">
                 <Database className="w-16 h-16 mb-6 opacity-20" />
                 <h3 className="text-xl font-medium">Module under construction</h3>
