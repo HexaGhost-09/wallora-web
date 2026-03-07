@@ -90,10 +90,10 @@ export async function checkDatabaseConnection() {
     const start = Date.now();
     await db.execute(sql`SELECT 1`);
     const duration = Date.now() - start;
-    return { status: "healthy", latency: duration };
-  } catch (error) {
+    return { status: "healthy", latency: duration, error: null };
+  } catch (error: any) {
     console.error("Database connection check failed:", error);
-    return { status: "unreachable", latency: 0 };
+    return { status: "unreachable", latency: 0, error: error?.message || String(error) };
   }
 }
 

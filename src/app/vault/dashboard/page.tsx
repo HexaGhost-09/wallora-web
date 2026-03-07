@@ -233,6 +233,11 @@ export default function AdminDashboard() {
                                 ? `Your serverless PostgreSQL instance is currently healthy and responding within ${dbStatus.latency}ms.`
                                 : "The database is currently unreachable. Please check your DATABASE_URL."}
                             </p>
+                            {(dbStatus as any).error && (
+                              <p className="mt-4 text-xs text-red-100 font-mono bg-black/40 p-3 rounded-lg border border-red-500/30 max-h-32 overflow-y-auto w-[300px]">
+                                {(dbStatus as any).error}
+                              </p>
+                            )}
                          </div>
                          <button 
                            onClick={fetchStats}
