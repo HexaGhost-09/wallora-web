@@ -6,10 +6,11 @@ import { eq } from "drizzle-orm";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const apkId = parseInt(params.id);
+    const { id } = await params;
+    const apkId = parseInt(id);
     
     // 1. Get the APK details
     const apk = await db.query.apkVersions.findFirst({
