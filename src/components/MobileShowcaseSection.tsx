@@ -32,7 +32,7 @@ const MobileShowcaseSection = () => {
 
             {/* Phone Frame */}
             <div className="relative w-[300px] h-[620px] rounded-[50px] bg-neutral-900 border-[6px] border-neutral-800 shadow-2xl overflow-hidden">
-              {/* Dynamic Island */}
+              {/* Dynamic Island — pill shape only, no camera dot */}
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30" />
 
               {/*
@@ -48,7 +48,8 @@ const MobileShowcaseSection = () => {
                   <img
                     key={wp.id}
                     src={wp.src}
-                    alt={wp.alt}
+                    alt=""
+                    role="presentation"
                     className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
                     style={{ opacity: activeId === wp.id ? 1 : 0 }}
                     loading="eager"
@@ -104,7 +105,8 @@ const MobileShowcaseSection = () => {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={wallpaper.src}
-                      alt={wallpaper.alt}
+                      alt=""
+                      role="presentation"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                   </div>
