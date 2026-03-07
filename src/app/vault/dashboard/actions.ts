@@ -93,7 +93,16 @@ export async function checkDatabaseConnection() {
     return { status: "healthy", latency: duration, error: null };
   } catch (error: any) {
     console.error("Database connection check failed:", error);
-    return { status: "unreachable", latency: 0, error: error?.message || String(error) };
+    
+    // Check if the var exists at all to help debug Netlify caching
+    const hasUrlAtRuntime = !!process.env.DATABASE_URL;
+    const urlLength = process.env.DATABASE_URL?.length || 0;
+    
+    return { 
+      status: "unreachable", 
+      latency: 0, 
+      error: (error?.message || String(error)) + `\n\n[Debug] Runtime URL exists: ${hasUrlAtRuntime} (length: ${urlLength})` 
+    };
   }
 }
 
