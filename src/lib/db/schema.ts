@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 
 export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),
@@ -14,7 +14,7 @@ export const systemLogs = pgTable("system_logs", {
   id: serial("id").primaryKey(),
   action: text("action").notNull(),
   details: text("details"),
-  adminId: serial("admin_id").references(() => admins.id),
+  adminId: integer("admin_id").references(() => admins.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -30,7 +30,7 @@ export const apkVersions = pgTable("apk_versions", {
 
 export const downloads = pgTable("downloads", {
   id: serial("id").primaryKey(),
-  apkId: serial("apk_id").references(() => apkVersions.id),
+  apkId: integer("apk_id").references(() => apkVersions.id),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   downloadedAt: timestamp("downloaded_at").defaultNow(),

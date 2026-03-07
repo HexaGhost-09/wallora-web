@@ -6,38 +6,33 @@ import { sql, desc } from "drizzle-orm";
 
 export async function getDashboardStats() {
   try {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
     // Total counts
     const totalVisits = await db.select({ count: sql<number>`count(*)` }).from(webAnalytics);
     const totalDownloads = await db.select({ count: sql<number>`count(*)` }).from(downloads);
     const totalAdmins = await db.select({ count: sql<number>`count(*)` }).from(admins);
     
-    // Daily counts
+    // Daily counts (Postgres native comparison)
     const dailyVisits = await db.select({ count: sql<number>`count(*)` })
       .from(webAnalytics)
-      .where(sql`${webAnalytics.visitedAt} >= ${startOfToday}`);
+      .where(sql`${webAnalytics.visitedAt}::date = CURRENT_DATE`);
     
     const dailyDownloads = await db.select({ count: sql<number>`count(*)` })
       .from(downloads)
-      .where(sql`${downloads.downloadedAt} >= ${startOfToday}`);
+      .where(sql`${downloads.downloadedAt}::date = CURRENT_DATE`);
 
     // Monthly counts
     const monthlyVisits = await db.select({ count: sql<number>`count(*)` })
       .from(webAnalytics)
-      .where(sql`${webAnalytics.visitedAt} >= ${startOfMonth}`);
+      .where(sql`${webAnalytics.visitedAt} >= date_trunc('month', CURRENT_DATE)`);
     
     const monthlyDownloads = await db.select({ count: sql<number>`count(*)` })
       .from(downloads)
-      .where(sql`${downloads.downloadedAt} >= ${startOfMonth}`);
+      .where(sql`${downloads.downloadedAt} >= date_trunc('month', CURRENT_DATE)`);
 
-    // Live users (active in last 5 mins)
-    const fiveMinsAgo = new Date(now.getTime() - 5 * 60 * 1000);
+    // Live users (active in last 5 mins using native interval)
     const liveUsers = await db.select({ count: sql<number>`count(distinct ${webAnalytics.ipAddress})` })
       .from(webAnalytics)
-      .where(sql`${webAnalytics.visitedAt} >= ${fiveMinsAgo}`);
+      .where(sql`${webAnalytics.visitedAt} >= now() - interval '5 minutes'`);
 
     const recentLogs = await db.select()
       .from(systemLogs)
@@ -88,5 +83,17 @@ export async function deleteApkVersion(id: number) {
 
 export async function getFullLogs() {
   return await db.select().from(systemLogs).orderBy(desc(systemLogs.createdAt)).limit(100);
+}
+
+export async function checkDatabaseConnection() {
+  try {
+    const start = Date.now();
+    await db.execute(sql`SELECT 1`);
+    const duration = Date.now() - start;
+    return { status: "healthy", latency: duration };
+  } catch (error) {
+    console.error("Database connection check failed:", error);
+    return { status: "unreachable", latency: 0 };
+  }
 }
 

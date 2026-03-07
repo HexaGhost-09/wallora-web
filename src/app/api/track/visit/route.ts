@@ -7,10 +7,12 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get("x-forwarded-for") || "unknown";
     const ua = req.headers.get("user-agent") || "unknown";
 
+    console.log(`[Analytics] Tracking visit to ${path} from ${ip}`);
     await trackVisit(path, ip, ua, referrer);
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error(`[Analytics Error] Failed to track: ${error}`);
     return NextResponse.json({ error: "Failed to track" }, { status: 500 });
   }
 }

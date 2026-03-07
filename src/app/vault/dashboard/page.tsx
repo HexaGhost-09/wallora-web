@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { getDashboardStats } from "./actions";
+import { getDashboardStats, checkDatabaseConnection } from "./actions";
 import { 
   LayoutDashboard, 
   Users, 
@@ -34,14 +34,26 @@ export default function AdminDashboard() {
     admins: 0,
     recentLogs: [] as any[]
   });
+  const [dbStatus, setDbStatus] = useState({ status: "checking", latency: 0 });
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchStats = async () => {
+    setIsRefreshing(true);
+    const data = await getDashboardStats();
+    setStats(data);
+    
+    const db = await checkDatabaseConnection();
+    setDbStatus(db);
+    setIsRefreshing(false);
+  };
 
   useEffect(() => {
     setIsMounted(true);
-    const fetchStats = async () => {
-      const data = await getDashboardStats();
-      setStats(data);
-    };
     fetchStats();
+    
+    // Auto refresh every 30 seconds for 'live' feeling
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleLogout = async () => {
@@ -208,17 +220,27 @@ export default function AdminDashboard() {
                      </div>
                    </div>
 
-                   <div className="bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-3xl p-8 relative overflow-hidden group">
+                   <div className={`bg-gradient-to-br transition-all duration-500 rounded-3xl p-8 relative overflow-hidden group ${
+                     dbStatus.status === "healthy" ? "from-indigo-600 to-indigo-900" : "from-red-600 to-red-900"
+                   }`}>
                       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-white/20 transition-all duration-700" />
                       <div className="relative z-10 h-full flex flex-col justify-between">
                          <div>
-                            <Shield className="w-12 h-12 text-white mb-6" />
+                            <Shield className={`w-12 h-12 text-white mb-6 ${isRefreshing ? "animate-pulse" : ""}`} />
                             <h3 className="text-2xl font-bold text-white mb-2">Neon Database Status</h3>
-                            <p className="text-indigo-100/70 text-sm">Your serverless PostgreSQL instance is currently healthy and responding within 24ms.</p>
+                            <p className="text-indigo-100/70 text-sm">
+                              {dbStatus.status === "healthy" 
+                                ? `Your serverless PostgreSQL instance is currently healthy and responding within ${dbStatus.latency}ms.`
+                                : "The database is currently unreachable. Please check your DATABASE_URL."}
+                            </p>
                          </div>
-                         <button className="mt-8 bg-white text-indigo-900 font-bold py-3 px-6 rounded-2xl flex items-center justify-center hover:bg-zinc-100 transition-all">
-                            Check Connection
-                            <ChevronRight className="ml-2 w-4 h-4" />
+                         <button 
+                           onClick={fetchStats}
+                           disabled={isRefreshing}
+                           className="mt-8 bg-white text-indigo-900 font-bold py-3 px-6 rounded-2xl flex items-center justify-center hover:bg-zinc-100 transition-all disabled:opacity-50"
+                         >
+                            {isRefreshing ? "Checking..." : "Check Connection"}
+                            {!isRefreshing && <ChevronRight className="ml-2 w-4 h-4" />}
                          </button>
                       </div>
                    </div>
