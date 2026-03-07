@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
 import { Download, Loader2, Calendar, Tag, FileText } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Define TypeScript interfaces for GitHub Release data
 interface GitHubReleaseAsset {
@@ -54,7 +56,7 @@ const ReleasesPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-24">
+    <div className="container mx-auto py-24 px-4 sm:px-6 lg:px-8">
       <h2 className="text-5xl md:text-6xl font-extrabold tracking-tighter mb-12 bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent text-center">
         All Releases
       </h2>
@@ -85,11 +87,15 @@ const ReleasesPage = () => {
                 <span>Published: {new Date(release.published_at).toLocaleDateString()}</span>
               </div>
               {release.body && (
-                <div className="text-neutral-300 leading-relaxed mb-6 prose prose-invert max-w-none">
-                  <h4 className="text-xl font-semibold text-white mb-2 flex items-center gap-2"><FileText size={20} /> Release Notes:</h4>
-                  {release.body.split('\n').map((line, index) => (
-                    <p key={index} className="mb-1">{line}</p>
-                  ))}
+                <div className="mb-6">
+                  <h4 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+                    <FileText size={20} /> Release Notes:
+                  </h4>
+                  <div className="prose prose-invert prose-cyan max-w-none text-neutral-300">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {release.body}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               )}
               {release.assets.length > 0 && (
@@ -130,4 +136,4 @@ const ReleasesPage = () => {
   );
 };
 
-export default ReleasesPage;
+export default ReleasesPage;

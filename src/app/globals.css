@@ -1,8 +1,5 @@
-/*
- * Corrected Tailwind CSS import.
- * This single line now imports all of Tailwind's layers (base, components, and utilities)
- */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -22,25 +19,14 @@ body {
 
 /* Custom styles for the prose content in the releases page */
 .prose {
-  color: var(--foreground);
-}
-
-.prose h1,
-.prose h2,
-.prose h3,
-.prose h4,
-.prose h5,
-.prose h6 {
-  color: #ffffff;
-}
-
-.prose p,
-.prose ul,
-.prose ol {
-  line-height: 1.6;
+  max-width: none;
 }
 
 .prose a {
-  color: #0ea5e9; /* Tailwind's sky-500 */
-  text-decoration: underline;
+  color: #22d3ee; /* Tailwind's cyan-400 */
+  text-decoration: none;
 }
+
+.prose a:hover {
+  text-decoration: underline;
+}

@@ -24,7 +24,7 @@ const FeatureCard = ({ icon, title, children, gradient }: {
 
 const WhyWalloraSection = () => {
   return (
-    <section className="py-20 px-6">
+    <section id="why-wallora" className="py-20 px-6">
       <div className="container mx-auto text-center">
         <h3 className="text-4xl font-bold mb-4 bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">Why Wallora?</h3>
         <p className="max-w-2xl mx-auto text-neutral-400 mb-12">
