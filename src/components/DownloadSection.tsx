@@ -23,13 +23,20 @@ interface DownloadSectionProps {
 
 const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps) => {
   const getApkDownloadUrl = () => {
+    let url = 'https://github.com/HexaGhost-09/wallora-2/releases';
     if (latestRelease && latestRelease.assets) {
       const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
-      if (generalApk) return generalApk.browser_download_url;
-      const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
-      if (anyApk) return anyApk.browser_download_url;
+      if (generalApk) {
+        url = generalApk.browser_download_url;
+      } else {
+        const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
+        if (anyApk) url = anyApk.browser_download_url;
+      }
     }
-    return 'https://github.com/HexaGhost-09/wallora-2/releases';
+    if (url.includes('.apk')) {
+      return `/api/track/download?url=${encodeURIComponent(url)}`;
+    }
+    return url;
   };
 
   return (

@@ -14,7 +14,7 @@ export async function trackVisit(path: string, ip?: string, ua?: string, ref?: s
   }
 }
 
-export async function trackDownload(apkId: number, ip?: string, ua?: string) {
+export async function trackDownload(apkId: number | null, ip?: string, ua?: string) {
   try {
     await db.insert(downloads).values({
       apkId,

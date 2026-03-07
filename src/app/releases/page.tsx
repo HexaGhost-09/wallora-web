@@ -76,7 +76,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
               <motion.a
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.97 }}
-                href={apk.browser_download_url}
+                href={`/api/track/download?url=${encodeURIComponent(apk.browser_download_url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex-shrink-0 inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${isLatest ? 'bg-white text-black hover:bg-neutral-100 shadow-lg shadow-white/10' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}
@@ -136,7 +136,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
             {release.assets.filter(a => !a.name.endsWith('.apk')).map(asset => (
               <a
                 key={asset.name}
-                href={asset.browser_download_url}
+                href={`/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white text-xs font-medium border border-white/5 hover:border-white/15 transition-all"
