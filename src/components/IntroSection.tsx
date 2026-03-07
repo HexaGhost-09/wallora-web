@@ -1,7 +1,10 @@
+"use client";
+
 import { Star, Github, Users, Download, Package } from 'lucide-react';
 import React from 'react';
+import { motion, Variants } from 'framer-motion';
 
-// Define TypeScript interfaces (ensure these are consistent with WalloraLandingPageV2.tsx)
+// ... (interfaces)
 interface GitHubReleaseAsset {
   name: string;
   browser_download_url: string;
@@ -13,7 +16,7 @@ interface GitHubRelease {
 }
 
 const formatStars = (num: number | null) => {
-  if (num === null) return '...'; // Displays "..." if data is null (e.g., while loading or on error)
+  if (num === null) return '...';
   if (num >= 1000) {
     return (num / 1000).toFixed(1) + 'k';
   }
@@ -27,80 +30,134 @@ interface IntroSectionProps {
 }
 
 const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionProps) => {
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "circOut" } },
+  };
+
   return (
-    <section className="relative text-center py-28 md:py-40 px-6">
-      <div className="relative z-10 container mx-auto flex flex-col items-center">
-        {/* Badges container */}
-        <div className="flex flex-wrap justify-center items-center gap-2 mb-4">
+    <section className="relative min-h-[95vh] flex items-center justify-center overflow-hidden px-6 pt-20">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 container mx-auto flex flex-col items-center text-center"
+      >
+        {/* Animated Badges */}
+        <motion.div variants={itemVariants} className="flex flex-wrap justify-center items-center gap-3 mb-10">
           {/* GitHub Star Badge */}
-          <a
+          <motion.a
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             href="https://github.com/HexaGhost-09/wallora-2"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+            className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.02)] hover:border-white/20"
           >
             <Github size={18} className="text-white" />
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-white">Star us on GitHub</span>
-              <div className="h-5 w-px bg-white/30"></div>
+              <span className="text-sm font-semibold text-neutral-300 group-hover:text-white transition-colors">Star project</span>
+              <div className="h-4 w-px bg-white/20"></div>
               <div className="flex items-center gap-1">
-                <Star size={16} className="text-yellow-400" />
-                <span className="font-bold text-white">{formatStars(stars)}</span>
+                <Star size={14} className="text-yellow-400 fill-yellow-400" />
+                <span className="font-bold text-white tracking-tight">{formatStars(stars)}</span>
               </div>
             </div>
-          </a>
+          </motion.a>
 
           {/* Contributors Badge */}
-          <a
+          <motion.a
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             href="https://github.com/HexaGhost-09/wallora-2/graphs/contributors"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
           >
-            <Users size={18} className="text-white" />
+            <Users size={18} className="text-neutral-400 group-hover:text-white transition-colors" />
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-white">Contributors</span>
-              <div className="h-5 w-px bg-white/30"></div>
-              <span className="font-bold text-white">
+              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">Contributors</span>
+              <div className="h-4 w-px bg-white/20"></div>
+              <span className="font-bold text-white tracking-tight">
                 {contributorsCount !== null ? contributorsCount : '...'}
               </span>
             </div>
-          </a>
+          </motion.a>
 
-          {/* Release Version Badge */}
-          <a
+          {/* Version Badge */}
+          <motion.a
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             href="https://github.com/HexaGhost-09/wallora-2/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 transition-all duration-300 hover:bg-white/20 hover:border-white/30"
+            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
           >
-            <Package size={18} className="text-white" />
+            <Package size={18} className="text-cyan-400" />
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-white">Version</span>
-              <div className="h-5 w-px bg-white/30"></div>
-              <span className="font-bold text-white">
-                {latestRelease?.tag_name ? latestRelease.tag_name.replace('v', '') : '...'}
+              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">v1.3.6</span>
+              <div className="h-4 w-px bg-white/20"></div>
+              <span className="font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                Latest
               </span>
             </div>
-          </a>
-        </div>
+          </motion.a>
+        </motion.div>
 
-        <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter mt-6 mb-4 bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">
-          Your Screen, Reimagined.
-        </h2>
-        <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-300 mb-8">
-          Step into a universe of breathtaking wallpapers. Wallora brings you exclusive, high-quality backgrounds to make your device truly yours.
-        </p>
-        <a
-          href="#download"
-          className="bg-white text-black font-semibold py-4 px-10 rounded-xl transition-all duration-300 transform hover:scale-105 hover:bg-neutral-200 flex items-center space-x-2"
+        <motion.h2 
+          variants={itemVariants}
+          className="text-7xl md:text-9xl font-black tracking-tighter mt-4 mb-8 leading-[0.85] uppercase"
         >
-          <Download size={18} />
-          <span>Download Now</span>
-        </a>
-      </div>
+          <span className="block opacity-90">YOUR SCREEN</span>
+          <span className="block bg-gradient-to-r from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
+            REIMAGINED.
+          </span>
+        </motion.h2>
+
+        <motion.p 
+          variants={itemVariants}
+          className="max-w-xl mx-auto text-xl md:text-2xl text-neutral-400 mb-12 font-medium leading-relaxed"
+        >
+          Exclusive, high-quality backgrounds designed to make your device truly yours.
+        </motion.p>
+
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
+          <motion.a
+            whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(255, 255, 255, 0.15)' }}
+            whileTap={{ scale: 0.95 }}
+            href="#download"
+            className="bg-white text-black font-black py-5 px-14 rounded-2xl transition-all duration-300 flex items-center space-x-3 text-xl"
+          >
+            <Download size={24} />
+            <span>Download Now</span>
+          </motion.a>
+          
+          <motion.a
+            whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+            whileTap={{ scale: 0.95 }}
+            href="/releases"
+            className="text-white border border-white/20 font-bold py-5 px-14 rounded-2xl transition-all duration-300 flex items-center space-x-3 text-xl backdrop-blur-md"
+          >
+            <span>Read Updates</span>
+          </motion.a>
+        </motion.div>
+      </motion.div>
+
+      {/* Decorative center glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vh] bg-white/5 rounded-full blur-[120px] -z-10" />
     </section>
   );
 };
 
-export default IntroSection;
+export default IntroSection;
