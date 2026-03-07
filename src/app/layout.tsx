@@ -4,6 +4,8 @@ import React from 'react';
 import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { usePathname } from 'next/navigation';
+import { AnalyticsTracker } from '@/components/AnalyticsTracker';
 import "./globals.css";
 import { DatabuddyScript } from '@/components/DatabuddyScript';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +20,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith('/vault');
+
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -62,7 +67,7 @@ export default function RootLayout({
           />
         </div>
 
-        <Header />
+        {!isAdminRoute && <Header />}
         <AnimatePresence mode="wait">
           <motion.main
             initial={{ opacity: 0, y: 10 }}
@@ -72,8 +77,9 @@ export default function RootLayout({
             {children}
           </motion.main>
         </AnimatePresence>
-        <Footer />
+        {!isAdminRoute && <Footer />}
 
+        <AnalyticsTracker />
         <DatabuddyScript />
       </body>
     </html>
