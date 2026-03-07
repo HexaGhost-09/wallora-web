@@ -29,10 +29,34 @@ export async function getDashboardStats() {
       .from(downloads)
       .where(sql`${downloads.downloadedAt} >= date_trunc('month', CURRENT_DATE)`);
 
-    // Live users (active in last 5 mins using native interval)
-    const liveUsers = await db.select({ count: sql<number>`count(distinct ${webAnalytics.ipAddress})` })
+    const chartDataRaw = await db.execute(sql`
+      SELECT DATE(visited_at) as date, COUNT(*) as visits 
+      FROM web_analytics 
+      WHERE visited_at >= NOW() - INTERVAL '7 days' 
+      GROUP BY DATE(visited_at) 
+      ORDER BY DATE(visited_at) ASC
+    `);
+
+    // In Neon Serverless, the rows are inside the 'rows' property
+    const chartData = (chartDataRaw as any)?.rows?.map((row: any) => ({
+      name: new Date(row.date).toLocaleDateString('en-US', { weekday: 'short' }),
+      visits: Number(row.visits)
+    })) || [];
+
+    // Ensure we have 7 days even if empty
+    const filledChartData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const name = d.toLocaleDateString('en-US', { weekday: 'short' });
+      const existing = chartData.find((c: any) => c.name === name);
+      filledChartData.push(existing || { name, visits: 0 });
+    }
+
+    // Live users (distinct IP + UA combination in last 10 mins)
+    const liveUsers = await db.select({ count: sql<number>`count(distinct CONCAT(${webAnalytics.ipAddress}, '-', ${webAnalytics.userAgent}))` })
       .from(webAnalytics)
-      .where(sql`${webAnalytics.visitedAt} >= now() - interval '5 minutes'`);
+      .where(sql`${webAnalytics.visitedAt} >= now() - interval '10 minutes'`);
 
     const recentLogs = await db.select()
       .from(systemLogs)
@@ -48,6 +72,7 @@ export async function getDashboardStats() {
       monthlyDownloads: Number(monthlyDownloads[0].count) || 0,
       liveUsers: Number(liveUsers[0].count) || 0,
       admins: Number(totalAdmins[0].count) || 0,
+      chartData: filledChartData,
       recentLogs: recentLogs.map(log => ({
         ...log,
         createdAt: log.createdAt?.toISOString() || new Date().toISOString()
@@ -64,6 +89,7 @@ export async function getDashboardStats() {
       monthlyDownloads: 0,
       liveUsers: 0,
       admins: 0,
+      chartData: [],
       recentLogs: []
     };
   }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { getDashboardStats, checkDatabaseConnection } from "./actions";
 import { 
   LayoutDashboard, 
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
     monthlyDownloads: 0,
     liveUsers: 0,
     admins: 0,
+    chartData: [] as any[],
     recentLogs: [] as any[]
   });
   const [dbStatus, setDbStatus] = useState({ status: "checking", latency: 0 });
@@ -191,8 +193,32 @@ export default function AdminDashboard() {
                   ))}
                 </div>
 
+                {/* Traffic Graph */}
+                <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8 mt-8">
+                  <h3 className="text-xl font-bold mb-6">Traffic Analytics (Last 7 Days)</h3>
+                  <div className="h-72 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={stats.chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
+                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="name" stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="#52525b" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value}`} />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#09090b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                          itemStyle={{ color: '#a78bfa' }}
+                        />
+                        <Area type="monotone" dataKey="visits" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#colorVisits)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
                 {/* Main Dashboard Section */}
-                <div className="grid grid-cols-3 gap-8">
+                <div className="grid grid-cols-3 gap-8 mt-8">
                    <div className="col-span-2 bg-zinc-900 border border-white/5 rounded-3xl p-8">
                      <div className="flex items-center justify-between mb-8">
                        <h3 className="text-xl font-bold">Recent System Activity</h3>
@@ -286,11 +312,58 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {activeTab !== "overview" && activeTab !== "logs" && activeTab !== "database" && (
-              <div className="flex flex-col items-center justify-center h-[60vh] text-zinc-500">
-                <Database className="w-16 h-16 mb-6 opacity-20" />
-                <h3 className="text-xl font-medium">Module under construction</h3>
-                <p className="text-sm mt-2">The <span className="text-indigo-400">{activeTab}</span> component is being provisioned.</p>
+            {activeTab === "users" && (
+              <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-xl font-bold">Admin Privileges</h3>
+                  <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-bold transition-colors">
+                    + Invite Admin
+                  </button>
+                </div>
+                <div className="border border-white/5 rounded-2xl overflow-hidden bg-black/20">
+                   <div className="grid grid-cols-4 p-4 border-b border-white/5 text-xs text-zinc-500 font-bold uppercase tracking-wider">
+                      <div className="col-span-2">User</div>
+                      <div>Role</div>
+                      <div>Status</div>
+                   </div>
+                   <div className="grid grid-cols-4 p-4 items-center">
+                      <div className="col-span-2 flex items-center space-x-3">
+                         <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">AD</div>
+                         <div>
+                            <p className="font-bold">System Administrator</p>
+                            <p className="text-xs text-zinc-500">primary@wallora.com</p>
+                         </div>
+                      </div>
+                      <div className="text-sm font-medium text-indigo-400">Super Admin</div>
+                      <div><span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded-lg border border-emerald-500/20">Active</span></div>
+                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "settings" && (
+              <div className="bg-zinc-900 border border-white/5 rounded-3xl p-8 max-w-2xl">
+                <h3 className="text-xl font-bold mb-8">Vault Configuration</h3>
+                <div className="space-y-6">
+                   <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
+                      <div>
+                         <p className="font-bold">Two-Factor Authentication</p>
+                         <p className="text-sm text-zinc-500 mt-1">Require 2FA for all vault administrators</p>
+                      </div>
+                      <div className="w-12 h-6 bg-indigo-600 rounded-full relative cursor-pointer">
+                         <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                      </div>
+                   </div>
+                   <div className="flex items-center justify-between p-4 bg-black/20 rounded-2xl border border-white/5">
+                      <div>
+                         <p className="font-bold">Maintenance Mode</p>
+                         <p className="text-sm text-zinc-500 mt-1">Suspend API and restrict public dashboard access</p>
+                      </div>
+                      <div className="w-12 h-6 bg-zinc-700 rounded-full relative cursor-pointer">
+                         <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+                      </div>
+                   </div>
+                </div>
               </div>
             )}
           </motion.div>
