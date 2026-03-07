@@ -2,64 +2,62 @@
 
 import { useState } from 'react';
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const wallpapers = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=1887&auto=format&fit=crop', alt: 'Abstract 3D render' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070&auto=format&fit=crop', alt: 'Colorful gradient' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?q=80&w=1748&auto=format&fit=crop', alt: 'Liquid marble texture' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964&auto=format&fit=crop', alt: 'Blue and pink abstract shapes' },
+  { id: 1, src: 'https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=600&auto=format&fit=crop', alt: 'Abstract 3D render' },
+  { id: 2, src: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600&auto=format&fit=crop', alt: 'Colorful gradient' },
+  { id: 3, src: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?q=80&w=600&auto=format&fit=crop', alt: 'Liquid marble texture' },
+  { id: 4, src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop', alt: 'Blue and pink abstract shapes' },
 ];
 
-const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-  e.currentTarget.src = `https://placehold.co/300x650/0a0a0a/ffffff?text=Wallora`;
-  e.currentTarget.onerror = null;
-};
-
 const MobileShowcaseSection = () => {
-  const [activeImage, setActiveImage] = useState(wallpapers[0].src);
+  const [activeId, setActiveId] = useState(wallpapers[0].id);
 
   return (
     <section className="py-32 px-6 overflow-hidden">
       <div className="container mx-auto">
         <div className="flex flex-col lg:flex-row items-center justify-center gap-16 lg:gap-32">
-          
-          {/* Advanced Phone Mockup */}
-          <motion.div 
+
+          {/* Phone Mockup */}
+          <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative"
+            className="relative flex-shrink-0"
           >
             {/* Outer Glow */}
             <div className="absolute inset-0 bg-cyan-500/20 blur-[100px] -z-10 rounded-full scale-75" />
-            
-            <div className="relative w-[320px] h-[660px] p-[10px] rounded-[54px] bg-neutral-900 border-[6px] border-neutral-800 shadow-2xl">
-              {/* Screen Content */}
-              <div className="relative w-full h-full bg-black rounded-[42px] overflow-hidden">
-                {/* Dynamic Island */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-28 h-7 bg-black rounded-full z-20 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-neutral-800 ml-auto mr-4" />
-                </div>
-                
-                <AnimatePresence mode="wait">
-                  <motion.img
-                    key={activeImage}
-                    src={activeImage}
-                    alt="Wallpaper preview"
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
-                    className="w-full h-full object-cover"
-                    onError={handleImageError}
-                  />
-                </AnimatePresence>
 
-                {/* Glass Reflection */}
-                <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/5 to-transparent z-10" />
+            {/* Phone Frame */}
+            <div className="relative w-[300px] h-[620px] rounded-[50px] bg-neutral-900 border-[6px] border-neutral-800 shadow-2xl overflow-hidden">
+              {/* Dynamic Island */}
+              <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30" />
+
+              {/*
+               * Stacked images with CSS opacity crossfade.
+               * This is intentionally NOT using next/image or motion.img because
+               * AnimatePresence + scale transforms inside overflow:hidden caused a
+               * black-screen rendering bug. Plain <img> with opacity transition is
+               * the most reliable crossfade approach here.
+               */}
+              <div className="absolute inset-0">
+                {wallpapers.map((wp) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={wp.id}
+                    src={wp.src}
+                    alt={wp.alt}
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+                    style={{ opacity: activeId === wp.id ? 1 : 0 }}
+                    loading="eager"
+                  />
+                ))}
               </div>
+
+              {/* Glass Reflection */}
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-tr from-white/5 to-transparent z-20" />
             </div>
           </motion.div>
 
@@ -79,37 +77,36 @@ const MobileShowcaseSection = () => {
               </p>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4"
+              className="grid grid-cols-2 gap-4"
             >
               {wallpapers.map((wallpaper, idx) => (
                 <motion.button
                   key={wallpaper.id}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  whileTap={{ scale: 0.96 }}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.1 * idx }}
-                  onClick={() => setActiveImage(wallpaper.src)}
-                  className={`relative p-1 rounded-2xl overflow-hidden group transition-all duration-500 ${
-                    activeImage === wallpaper.src 
-                    ? 'bg-gradient-to-br from-cyan-400 to-fuchsia-600' 
-                    : 'bg-white/10 hover:bg-white/20'
+                  transition={{ delay: 0.08 * idx }}
+                  onClick={() => setActiveId(wallpaper.id)}
+                  className={`relative overflow-hidden rounded-2xl group transition-all duration-300 ${
+                    activeId === wallpaper.id
+                      ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-black'
+                      : 'opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <div className="relative w-full h-40 rounded-[14px] overflow-hidden">
-                    <img 
-                      src={wallpaper.src} 
-                      alt={wallpaper.alt} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                      onError={handleImageError} 
+                  <div className="relative w-full h-36 overflow-hidden rounded-[14px]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={wallpaper.src}
+                      alt={wallpaper.alt}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
                   </div>
                 </motion.button>
               ))}
@@ -121,4 +118,4 @@ const MobileShowcaseSection = () => {
   );
 };
 
-export default MobileShowcaseSection;
+export default MobileShowcaseSection;
