@@ -5,10 +5,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const wallpapers = [
-  { id: 1, src: 'https://images.unsplash.com/photo-1620766165236-42495b731a87?q=80&w=600&auto=format&fit=crop', alt: 'Abstract 3D render' },
-  { id: 2, src: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600&auto=format&fit=crop', alt: 'Colorful gradient' },
-  { id: 3, src: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?q=80&w=600&auto=format&fit=crop', alt: 'Liquid marble texture' },
-  { id: 4, src: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop', alt: 'Blue and pink abstract shapes' },
+  { id: 1, src: 'https://images.unsplash.com/photo-1550684848-86a5d8727436?q=80&w=600&auto=format&fit=crop', alt: 'Pure Dark Abstract' },
+  { id: 2, src: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=600&auto=format&fit=crop', alt: 'Neon Wave' },
+  { id: 3, src: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?q=80&w=600&auto=format&fit=crop', alt: 'Glass Morphism' },
+  { id: 4, src: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&auto=format&fit=crop', alt: 'Deep Gradient' },
 ];
 
 const MobileShowcaseSection = () => {
