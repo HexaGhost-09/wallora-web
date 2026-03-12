@@ -39,6 +39,8 @@ export default function AdminDashboard() {
   const [dbStatus, setDbStatus] = useState({ status: "checking", latency: 0 });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const fetchStats = async () => {
     setIsRefreshing(true);
     const data = await getDashboardStats();
@@ -76,21 +78,53 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30 font-sans">
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-zinc-950 border-b border-white/5 z-[60] flex items-center justify-between px-6">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+            <Shield className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-lg font-bold tracking-tight">Wallora Panel</span>
+        </div>
+        <button 
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="p-2 text-zinc-400 hover:text-white"
+        >
+          <LayoutDashboard className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Sidebar Backdrop */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-72 bg-zinc-950 border-r border-white/5 z-50">
-        <div className="p-8">
-          <div className="flex items-center space-x-3 mb-12">
+      <aside className={`fixed left-0 top-0 bottom-0 w-72 bg-zinc-950 border-r border-white/5 z-[80] transition-transform duration-300 transform lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-8 h-full flex flex-col">
+          <div className="hidden lg:flex items-center space-x-3 mb-12">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
               <Shield className="w-6 h-6" />
             </div>
             <span className="text-xl font-bold tracking-tight">Wallora Panel</span>
           </div>
 
-          <nav className="space-y-2">
+          <nav className="space-y-2 flex-grow">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsSidebarOpen(false);
+                }}
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 group ${
                   activeTab === item.id 
                     ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20" 
@@ -105,25 +139,25 @@ export default function AdminDashboard() {
               </button>
             ))}
           </nav>
-        </div>
 
-        <div className="absolute bottom-8 left-8 right-8">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent transition-all"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Secure Logout</span>
-          </button>
+          <div className="mt-auto">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-zinc-500 hover:text-red-400 hover:bg-red-500/10 border border-transparent transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Secure Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="pl-72 pt-8 pr-8 pb-8">
+      <main className="lg:pl-72 pt-16 lg:pt-8 p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <header className="flex items-center justify-between mb-12 bg-zinc-900/40 backdrop-blur-md p-6 rounded-3xl border border-white/5">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center overflow-hidden">
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8 lg:mb-12 bg-zinc-900/40 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-white/5">
+          <div className="flex items-center space-x-4 w-full sm:w-auto">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 border border-white/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                <img src="https://ui-avatars.com/api/?name=Admin&background=101010&color=fff" alt="Avatar" className="w-full h-full object-cover" />
             </div>
             <div>
@@ -132,16 +166,16 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-             <div className="relative group">
+          <div className="flex items-center space-x-4 w-full sm:w-auto">
+             <div className="relative group flex-grow sm:flex-grow-0">
                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                <input 
                  type="text" 
-                 placeholder="Search Vault..." 
-                 className="bg-black/50 border border-white/5 rounded-2xl py-3 pl-12 pr-6 text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" 
+                 placeholder="Search..." 
+                 className="bg-black/50 border border-white/5 rounded-2xl py-3 pl-12 pr-6 text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all" 
                />
              </div>
-             <button className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white transition-colors relative">
+             <button className="p-3 rounded-2xl bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white transition-colors relative flex-shrink-0">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-3 right-3 w-2 h-2 bg-indigo-500 rounded-full border border-black" />
              </button>
@@ -157,9 +191,9 @@ export default function AdminDashboard() {
             transition={{ duration: 0.3 }}
           >
             {activeTab === "overview" && (
-              <div className="space-y-8">
+              <div className="space-y-6 md:space-y-8">
                 {/* Stats Grid */}
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {[
                     { label: "Live Users", value: stats.liveUsers.toString(), icon: Users, color: "text-blue-400", bg: "bg-blue-500/10" },
                     { label: "Daily Visits", value: stats.dailyVisits.toString(), icon: Activity, color: "text-emerald-400", bg: "bg-emerald-500/10" },
@@ -176,7 +210,7 @@ export default function AdminDashboard() {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {[
                     { label: "Daily APK", value: stats.dailyDownloads.toString(), icon: Zap, color: "text-orange-400", bg: "bg-orange-500/10" },
                     { label: "Monthly APK", value: stats.monthlyDownloads.toString(), icon: Zap, color: "text-yellow-400", bg: "bg-yellow-500/10" },
@@ -218,24 +252,24 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Main Dashboard Section */}
-                <div className="grid grid-cols-3 gap-8 mt-8">
-                   <div className="col-span-2 bg-zinc-900 border border-white/5 rounded-3xl p-8">
+                <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8 mt-8">
+                   <div className="xl:col-span-2 bg-zinc-900 border border-white/5 rounded-3xl p-6 sm:p-8">
                      <div className="flex items-center justify-between mb-8">
                        <h3 className="text-xl font-bold">Recent System Activity</h3>
                        <button className="text-sm text-indigo-400 hover:underline">View all</button>
                      </div>
                      
-                     <div className="space-y-6">
+                     <div className="space-y-4 sm:space-y-6">
                         {stats.recentLogs.map((log, i) => (
-                          <div key={i} className="flex items-center justify-between p-4 bg-black/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all cursor-default">
+                          <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-black/30 rounded-2xl border border-white/5 hover:border-white/10 transition-all cursor-default gap-4">
                              <div className="flex items-center space-x-4">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] flex-shrink-0" />
                                 <div>
-                                   <p className="font-medium text-white">{log.action}</p>
-                                   <p className="text-sm text-zinc-500">{log.details}</p>
+                                   <p className="font-medium text-white line-clamp-1">{log.action}</p>
+                                   <p className="text-sm text-zinc-500 line-clamp-1">{log.details}</p>
                                 </div>
                              </div>
-                             <span className="text-xs text-zinc-600 uppercase font-bold">
+                             <span className="text-[10px] sm:text-xs text-zinc-600 uppercase font-bold flex-shrink-0">
                                 {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                              </span>
                           </div>
@@ -246,7 +280,7 @@ export default function AdminDashboard() {
                      </div>
                    </div>
 
-                   <div className={`bg-gradient-to-br transition-all duration-500 rounded-3xl p-8 relative overflow-hidden group ${
+                   <div className={`bg-gradient-to-br transition-all duration-500 rounded-3xl p-6 sm:p-8 relative overflow-hidden group ${
                      dbStatus.status === "healthy" ? "from-indigo-600 to-indigo-900" : "from-red-600 to-red-900"
                    }`}>
                       <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-white/20 transition-all duration-700" />
@@ -260,7 +294,7 @@ export default function AdminDashboard() {
                                 : "The database is currently unreachable. Please check your DATABASE_URL."}
                             </p>
                             {(dbStatus as any).error && (
-                              <p className="mt-4 text-xs text-red-100 font-mono bg-black/40 p-3 rounded-lg border border-red-500/30 max-h-32 overflow-y-auto w-[300px]">
+                              <p className="mt-4 text-xs text-red-100 font-mono bg-black/40 p-3 rounded-lg border border-red-500/30 max-h-32 overflow-y-auto w-full">
                                 {(dbStatus as any).error}
                               </p>
                             )}
@@ -268,7 +302,7 @@ export default function AdminDashboard() {
                          <button 
                            onClick={fetchStats}
                            disabled={isRefreshing}
-                           className="mt-8 bg-white text-indigo-900 font-bold py-3 px-6 rounded-2xl flex items-center justify-center hover:bg-zinc-100 transition-all disabled:opacity-50"
+                           className="mt-8 bg-white text-indigo-900 font-bold py-3 px-6 rounded-2xl flex items-center justify-center hover:bg-zinc-100 transition-all disabled:opacity-50 w-full sm:w-auto"
                          >
                             {isRefreshing ? "Checking..." : "Check Connection"}
                             {!isRefreshing && <ChevronRight className="ml-2 w-4 h-4" />}

@@ -34,18 +34,18 @@ const FeatureCard = ({ icon, title, children, gradient, index }: {
 
 const WhyWalloraSection = () => {
   return (
-    <section id="why-wallora" className="py-32 px-6">
+    <section id="why-wallora" className="py-20 md:py-32 px-6">
       <div className="container mx-auto">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16 space-y-4"
+          className="text-center mb-12 md:mb-16 space-y-4"
         >
-          <h3 className="text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">
+          <h3 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent uppercase">
             WHY WALLORA?
           </h3>
-          <p className="max-w-2xl mx-auto text-xl text-neutral-400 font-medium tracking-tight">
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-400 font-medium tracking-tight">
             Packed with features to make your wallpaper experience seamless and enjoyable.
           </p>
         </motion.div>

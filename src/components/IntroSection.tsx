@@ -117,7 +117,7 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
 
         <motion.h2 
           variants={itemVariants}
-          className="text-7xl md:text-9xl font-black tracking-tighter mt-4 mb-8 leading-[0.85] uppercase"
+          className="text-5xl sm:text-7xl md:text-9xl font-black tracking-tighter mt-4 mb-8 leading-[0.85] uppercase"
         >
           <span className="block opacity-90">YOUR SCREEN</span>
           <span className="block bg-gradient-to-r from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
@@ -127,19 +127,19 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
 
         <motion.p 
           variants={itemVariants}
-          className="max-w-xl mx-auto text-xl md:text-2xl text-neutral-400 mb-12 font-medium leading-relaxed"
+          className="max-w-xl mx-auto text-lg sm:text-xl md:text-2xl text-neutral-400 mb-12 font-medium leading-relaxed"
         >
           Exclusive, high-quality backgrounds designed to make your device truly yours.
         </motion.p>
 
-        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6">
+        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
           <motion.a
             whileHover={{ scale: 1.05, boxShadow: '0 0 40px rgba(255, 255, 255, 0.15)' }}
             whileTap={{ scale: 0.95 }}
             href="#download"
-            className="bg-white text-black font-black py-5 px-14 rounded-2xl transition-all duration-300 flex items-center space-x-3 text-xl"
+            className="w-full sm:w-auto bg-white text-black font-black py-4 sm:py-5 px-10 sm:px-14 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 text-lg sm:text-xl"
           >
-            <Download size={24} />
+            <Download size={22} />
             <span>Download Now</span>
           </motion.a>
           
@@ -147,7 +147,7 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
             whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
             whileTap={{ scale: 0.95 }}
             href="/releases"
-            className="text-white border border-white/20 font-bold py-5 px-14 rounded-2xl transition-all duration-300 flex items-center space-x-3 text-xl backdrop-blur-md"
+            className="w-full sm:w-auto text-white border border-white/20 font-bold py-4 sm:py-5 px-10 sm:px-14 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-3 text-lg sm:text-xl backdrop-blur-md"
           >
             <span>Read Updates</span>
           </motion.a>

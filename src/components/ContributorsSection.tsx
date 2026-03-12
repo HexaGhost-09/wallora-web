@@ -69,21 +69,21 @@ const ContributorsSection = () => {
     }, []);
 
     return (
-        <section id="contributors" className="py-32 px-6 overflow-hidden">
+        <section id="contributors" className="py-20 md:py-32 px-6 overflow-hidden">
             <div className="container mx-auto">
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-center mb-16 space-y-4"
+                    className="text-center mb-12 md:mb-16 space-y-4"
                 >
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-sm font-bold uppercase tracking-widest mb-4">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/20 text-fuchsia-400 text-sm font-bold uppercase tracking-widest mb-2 md:mb-4">
                         <Users size={16} /> Community
                     </div>
-                    <h2 className="text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
+                    <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent uppercase">
                         THE ARTISTS BEHIND WALLORA
                     </h2>
-                    <p className="max-w-2xl mx-auto text-xl text-neutral-400 font-medium italic">
+                    <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-400 font-medium italic">
                         Our project is built by the community. It&apos;s all thanks to these amazing creators!
                     </p>
                 </motion.div>

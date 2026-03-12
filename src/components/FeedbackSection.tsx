@@ -6,18 +6,18 @@ import { motion } from 'framer-motion';
 
 const FeedbackSection = () => {
   return (
-    <section className="py-24 px-6 relative">
+    <section className="py-16 md:py-24 px-6 relative">
       <div className="container mx-auto text-center relative z-10">
         <motion.div
            initial={{ opacity: 0, y: 20 }}
            whileInView={{ opacity: 1, y: 0 }}
            viewport={{ once: true }}
-           className="space-y-4 mb-12"
+           className="space-y-4 mb-10 md:mb-12"
         >
-          <h4 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">
+          <h4 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-br from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent uppercase">
             HELP US IMPROVE
           </h4>
-          <p className="max-w-2xl mx-auto text-xl text-neutral-400 font-medium italic">
+          <p className="max-w-2xl mx-auto text-lg md:text-xl text-neutral-400 font-medium italic">
             Your feedback helps us make Wallora even better. Have an idea, a feature request, or found a bug?
           </p>
         </motion.div>

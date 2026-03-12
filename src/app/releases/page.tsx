@@ -46,18 +46,18 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06, duration: 0.5, ease: 'easeOut' }}
-      className={`relative flex gap-6 md:gap-10 group`}
+      className={`relative flex gap-4 sm:gap-6 md:gap-10 group`}
     >
       {/* Timeline spine */}
-      <div className="flex flex-col items-center flex-shrink-0 w-10">
-        <div className={`w-4 h-4 rounded-full border-2 mt-1 flex-shrink-0 z-10 transition-colors ${isLatest ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]' : 'bg-neutral-800 border-neutral-600 group-hover:border-neutral-400'}`} />
+      <div className="flex flex-col items-center flex-shrink-0 w-8 sm:w-10">
+        <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full border-2 mt-1 flex-shrink-0 z-10 transition-colors ${isLatest ? 'bg-cyan-400 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)]' : 'bg-neutral-800 border-neutral-600 group-hover:border-neutral-400'}`} />
         <div className="w-px flex-1 bg-neutral-800 mt-2" />
       </div>
 
       {/* Card body */}
-      <div className={`flex-1 mb-10 pb-2 rounded-3xl border transition-colors duration-300 overflow-hidden ${isLatest ? 'border-cyan-500/30 bg-white/5' : 'border-white/8 bg-white/[0.03] hover:border-white/15'}`}>
+      <div className={`flex-1 mb-10 pb-2 rounded-[24px] sm:rounded-3xl border transition-colors duration-300 overflow-hidden ${isLatest ? 'border-cyan-500/30 bg-white/5' : 'border-white/8 bg-white/[0.03] hover:border-white/15'}`}>
         {/* Card Header */}
-        <div className="p-6 md:p-8">
+        <div className="p-5 sm:p-6 md:p-8">
           <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
             <div className="space-y-1.5">
               <div className="flex items-center gap-3 flex-wrap">
@@ -190,10 +190,10 @@ const ReleasesPage = () => {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-400/10 border border-cyan-400/20 text-cyan-400 text-xs font-black uppercase tracking-widest mb-2">
             <Package size={14} /> Release Archive
           </div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter bg-gradient-to-br from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-black tracking-tighter bg-gradient-to-br from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent uppercase">
             CHANGELOG
           </h1>
-          <p className="max-w-md mx-auto text-neutral-400 text-lg font-medium">
+          <p className="max-w-md mx-auto text-neutral-400 text-base md:text-lg font-medium">
             Every version, every update — fully documented. Download any release directly.
           </p>
           {releases.length > 0 && (

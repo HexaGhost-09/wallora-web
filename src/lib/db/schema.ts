@@ -44,3 +44,30 @@ export const webAnalytics = pgTable("web_analytics", {
   referrer: text("referrer"),
   visitedAt: timestamp("visited_at").defaultNow(),
 });
+
+export const testWallpapers = pgTable("test_wallpapers", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  image: text("image").notNull(),
+  download: text("download").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// Main wallpapers table — migrated from Deno API
+export const wallpapers = pgTable("wallpapers", {
+  id: text("id").primaryKey(),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  image: text("image").notNull(),      // compressed/preview URL
+  download: text("download").notNull(), // full-res URL
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+// Categories table
+export const categories = pgTable("categories", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  thumbnail: text("thumbnail").notNull(),
+  details: text("details"),
+});

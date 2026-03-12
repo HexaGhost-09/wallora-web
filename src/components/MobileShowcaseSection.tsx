@@ -25,13 +25,13 @@ const MobileShowcaseSection = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative flex-shrink-0"
+            className="relative flex-shrink-0 w-full flex justify-center lg:w-auto"
           >
             {/* Outer Glow */}
             <div className="absolute inset-0 bg-cyan-500/20 blur-[100px] -z-10 rounded-full scale-75" />
 
             {/* Phone Frame */}
-            <div className="relative w-[300px] h-[620px] rounded-[50px] bg-neutral-900 border-[6px] border-neutral-800 shadow-2xl overflow-hidden">
+            <div className="relative w-full max-w-[280px] sm:max-w-[300px] aspect-[300/620] h-auto rounded-[40px] sm:rounded-[50px] bg-neutral-900 border-[6px] border-neutral-800 shadow-2xl overflow-hidden">
               {/* Dynamic Island — pill shape only, no camera dot */}
               <div className="absolute top-3 left-1/2 -translate-x-1/2 w-24 h-6 bg-black rounded-full z-30" />
 
