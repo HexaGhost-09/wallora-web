@@ -60,7 +60,7 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-web"
+            href="https://github.com/HexaGhost-09/wallora-2"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.02)] hover:border-white/20"
@@ -85,7 +85,7 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-web/graphs/contributors"
+            href="https://github.com/HexaGhost-09/wallora-2/graphs/contributors"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
@@ -108,7 +108,7 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-web/releases/latest"
+            href="https://github.com/HexaGhost-09/wallora-2/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"

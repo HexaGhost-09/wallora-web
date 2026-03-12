@@ -53,7 +53,7 @@ const ContributorsSection = () => {
     useEffect(() => {
         const fetchContributors = async () => {
             try {
-                const response = await fetch('https://api.github.com/repos/HexaGhost-09/wallora-web/contributors?per_page=6');
+                const response = await fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors?per_page=6');
                 const data = await response.json();
                 if (Array.isArray(data)) {
                     setContributors(data);
