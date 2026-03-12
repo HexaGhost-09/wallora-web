@@ -26,7 +26,7 @@ export default function Footer() {
         <div>
           <h4 className="font-bold text-white mb-4 uppercase text-xs tracking-widest">Connect</h4>
           <div className="flex justify-center md:justify-start gap-4">
-            <a href="https://github.com/HexaGhost-09/wallora-2" target="_blank" rel="noopener noreferrer" className="text-neutral-500 hover:text-white transition-colors">
+            <a href="https://github.com/HexaGhost-09/wallora-web" target="_blank" rel="noopener noreferrer" className="text-neutral-500 hover:text-white transition-colors">
               <Github size={20} />
             </a>
             <a href="#" className="text-neutral-500 hover:text-white transition-colors">

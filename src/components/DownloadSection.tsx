@@ -23,7 +23,7 @@ interface DownloadSectionProps {
 
 const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps) => {
   const getApkDownloadUrl = () => {
-    let url = 'https://github.com/HexaGhost-09/wallora-2/releases';
+    let url = 'https://github.com/HexaGhost-09/wallora-web/releases';
     if (latestRelease && latestRelease.assets) {
       const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
       if (generalApk) {
@@ -84,7 +84,7 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="https://github.com/HexaGhost-09/wallora-2/releases"
+                href="https://github.com/HexaGhost-09/wallora-web/releases"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full bg-red-600/20 hover:bg-red-600/30 text-red-100 font-bold py-4 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 border border-red-500/30"

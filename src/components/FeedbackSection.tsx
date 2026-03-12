@@ -30,7 +30,7 @@ const FeedbackSection = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            href="https://github.com/HexaGhost-09/wallora-2/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml"
+            href="https://github.com/HexaGhost-09/wallora-web/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 py-3 px-8 rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-lg shadow-black/20"
@@ -46,7 +46,7 @@ const FeedbackSection = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            href="https://github.com/HexaGhost-09/wallora-2/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml"
+            href="https://github.com/HexaGhost-09/wallora-web/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 py-3 px-8 rounded-full bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-lg shadow-black/20"
