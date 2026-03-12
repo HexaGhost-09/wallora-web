@@ -60,11 +60,16 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2"
+            href="https://github.com/HexaGhost-09/wallora-web"
             target="_blank"
             rel="noopener noreferrer"
             className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.02)] hover:border-white/20"
           >
+            {/* Active Link indicator */}
+            <div className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-20"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.5)]"></span>
+            </div>
             <Github size={18} className="text-white" />
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-neutral-300 group-hover:text-white transition-colors">Star project</span>
@@ -80,11 +85,15 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2/graphs/contributors"
+            href="https://github.com/HexaGhost-09/wallora-web/graphs/contributors"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
+            className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
           >
+            <div className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-blue-500"></span>
+            </div>
             <Users size={18} className="text-neutral-400 group-hover:text-white transition-colors" />
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">Contributors</span>
@@ -99,14 +108,18 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2/releases/latest"
+            href="https://github.com/HexaGhost-09/wallora-web/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
+            className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
           >
+            <div className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-20"></span>
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-500"></span>
+            </div>
             <Package size={18} className="text-cyan-400" />
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">v1.3.6</span>
+              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">{latestRelease?.tag_name || 'v1.3.6'}</span>
               <div className="h-4 w-px bg-white/20"></div>
               <span className="font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                 Latest
