@@ -55,21 +55,21 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
         className="relative z-10 container mx-auto flex flex-col items-center text-center"
       >
         {/* Animated Badges */}
-        <motion.div variants={itemVariants} className="flex flex-wrap justify-center items-center gap-3 mb-10">
+        <motion.div variants={itemVariants} className="flex flex-wrap justify-center items-center gap-4 mb-10">
           {/* GitHub Star Badge */}
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2"
+            href="https://github.com/HexaGhost-09/wallora-web"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.02)] hover:border-white/20"
+            className="group relative inline-flex items-center gap-3 py-2.5 px-6 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.02)] hover:border-white/20 hover:bg-white/10"
           >
-            <Github size={18} className="text-white" />
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-neutral-300 group-hover:text-white transition-colors">Star project</span>
+            <Github size={18} className="text-white opacity-80 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center gap-2.5">
+              <span className="text-sm font-bold text-neutral-400 group-hover:text-white transition-colors">Star project</span>
               <div className="h-4 w-px bg-white/20"></div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5">
                 <Star size={14} className="text-yellow-400 fill-yellow-400" />
                 <span className="font-bold text-white tracking-tight">{formatStars(stars)}</span>
               </div>
@@ -80,14 +80,14 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2/graphs/contributors"
+            href="https://github.com/HexaGhost-09/wallora-web/graphs/contributors"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
+            className="group inline-flex items-center gap-3 py-2.5 px-6 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 transition-all duration-300 hover:border-white/20 hover:bg-white/10"
           >
             <Users size={18} className="text-neutral-400 group-hover:text-white transition-colors" />
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">Contributors</span>
+            <div className="flex items-center gap-2.5">
+              <span className="text-sm font-bold text-neutral-400 group-hover:text-white transition-colors">Contributors</span>
               <div className="h-4 w-px bg-white/20"></div>
               <span className="font-bold text-white tracking-tight">
                 {contributorsCount !== null ? contributorsCount : '...'}
@@ -99,14 +99,16 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
           <motion.a
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            href="https://github.com/HexaGhost-09/wallora-2/releases/latest"
+            href="https://github.com/HexaGhost-09/wallora-web/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
+            className="group inline-flex items-center gap-3 py-2.5 px-6 rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 transition-all duration-300 hover:border-white/20 hover:bg-white/10"
           >
-            <Package size={18} className="text-cyan-400" />
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">v1.3.6</span>
+            <Package size={18} className="text-cyan-400 group-hover:text-cyan-300 transition-colors" />
+            <div className="flex items-center gap-2.5">
+              <span className="text-sm font-bold text-neutral-400 group-hover:text-white transition-colors">
+                {latestRelease?.tag_name || 'v1.3.6'}
+              </span>
               <div className="h-4 w-px bg-white/20"></div>
               <span className="font-bold text-white tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                 Latest
