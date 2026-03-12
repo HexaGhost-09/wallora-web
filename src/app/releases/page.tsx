@@ -169,7 +169,7 @@ const ReleasesPage = () => {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch('https://api.github.com/repos/HexaGhost-09/wallora-web/releases')
+    fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases')
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then((data: GitHubRelease[]) => { setReleases(data); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
@@ -213,7 +213,7 @@ const ReleasesPage = () => {
           <div className="text-center py-24 space-y-4">
             <p className="text-neutral-400 text-lg">Couldn&apos;t load releases.</p>
             <a
-              href="https://github.com/HexaGhost-09/wallora-web/releases"
+              href="https://github.com/HexaGhost-09/wallora-2/releases"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/10 text-white font-bold hover:bg-white/20 transition-colors"

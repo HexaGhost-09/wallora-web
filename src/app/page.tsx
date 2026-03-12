@@ -44,9 +44,9 @@ export default function HomePage() {
     const fetchData = async () => {
       try {
         const [repoResponse, contributorsResponse, releaseResponse] = await Promise.all([
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-web'),
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-web/contributors'),
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-web/releases/latest')
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2'),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors'),
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest')
         ]);
 
         if (!repoResponse.ok || !contributorsResponse.ok || !releaseResponse.ok) {
