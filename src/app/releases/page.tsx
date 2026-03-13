@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import React from 'react';
-import { Download, Loader2, Github, ArrowUpRight, Package, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, Loader2, Github, ArrowUpRight, Package, ChevronDown, ChevronUp, Smartphone, Monitor, Laptop, Terminal } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +12,15 @@ interface GitHubReleaseAsset {
   browser_download_url: string;
   size: number;
 }
+
+const PLATFORMS = [
+  { id: 'android', name: 'Android', ext: '.apk', icon: Smartphone, label: 'APK' },
+  { id: 'windows', name: 'Windows', ext: '.exe', icon: Monitor, label: 'EXE' },
+  { id: 'macos', name: 'macOS', ext: '.dmg', icon: Laptop, label: 'DMG' },
+  { id: 'ios', name: 'iOS', ext: '.ipa', icon: Smartphone, label: 'IPA' },
+  { id: 'linux', name: 'Linux', ext: '.tar.gz', icon: Terminal, label: 'TAR.GZ' },
+];
+
 
 interface GitHubRelease {
   id: number;
@@ -39,7 +48,7 @@ const formatDate = (dateStr: string) => {
 
 const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; index: number; isLatest: boolean }) => {
   const [expanded, setExpanded] = useState(isLatest);
-  const apk = release.assets.find(a => a.name.endsWith('.apk'));
+
 
   return (
     <motion.div
@@ -71,21 +80,30 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
               </h3>
             </div>
 
-            {/* Primary download button */}
-            {apk && (
-              <motion.a
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-                href={`/api/track/download?url=${encodeURIComponent(apk.browser_download_url)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex-shrink-0 inline-flex items-center gap-2.5 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${isLatest ? 'bg-white text-black hover:bg-neutral-100 shadow-lg shadow-white/10' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}
-              >
-                <Download size={16} />
-                <span>APK</span>
-                <span className="text-xs font-normal opacity-60">{formatFileSize(apk.size)}</span>
-              </motion.a>
-            )}
+            {/* Platform Downloads */}
+            <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+              {PLATFORMS.map(platform => {
+                const asset = release.assets.find(a => a.name.toLowerCase().endsWith(platform.ext.toLowerCase()));
+                if (!asset) return null;
+                
+                return (
+                  <motion.a
+                    key={platform.id}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    href={`/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all duration-300 ${isLatest ? 'bg-white text-black hover:bg-neutral-100 shadow-lg shadow-white/5' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}
+                  >
+                    <platform.icon size={14} />
+                    <span>{platform.label}</span>
+                    <span className="text-[10px] font-normal opacity-50">{formatFileSize(asset.size)}</span>
+                  </motion.a>
+                );
+              })}
+            </div>
+
           </div>
         </div>
 
@@ -133,7 +151,13 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
         {/* Footer with all assets + GitHub link */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 md:px-8 py-4 border-t border-white/5">
           <div className="flex flex-wrap gap-2">
-            {release.assets.filter(a => !a.name.endsWith('.apk')).map(asset => (
+            {release.assets.filter(a => {
+              // Hide assets that are already shown in the platform grid
+              const isPlatformAsset = PLATFORMS.some(p => a.name.toLowerCase().endsWith(p.ext.toLowerCase()));
+              // Hide zips if it's a "release.zip" or similar generic zip that user wants to avoid
+              const isGenericZip = a.name.toLowerCase().includes('release.zip') || a.name.toLowerCase().includes('windows.zip') || a.name.toLowerCase().includes('macos.zip');
+              return !isPlatformAsset && !isGenericZip;
+            }).map(asset => (
               <a
                 key={asset.name}
                 href={`/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`}
@@ -147,6 +171,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
               </a>
             ))}
           </div>
+
           <a
             href={release.html_url}
             target="_blank"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Loader2, List } from 'lucide-react';
+import { Download, Loader2, List, Smartphone, Monitor, Laptop, Terminal, Apple } from 'lucide-react';
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -21,23 +21,27 @@ interface DownloadSectionProps {
   error: boolean;
 }
 
+const PLATFORMS = [
+  { id: 'android', name: 'Android', ext: '.apk', icon: Smartphone, label: 'APK' },
+  { id: 'windows', name: 'Windows', ext: '.exe', icon: Monitor, label: 'EXE' },
+  { id: 'macos', name: 'macOS', ext: '.dmg', icon: Laptop, label: 'DMG' },
+  { id: 'ios', name: 'iOS', ext: '.ipa', icon: Smartphone, label: 'IPA' },
+  { id: 'linux', name: 'Linux', ext: '.tar.gz', icon: Terminal, label: 'TAR.GZ' },
+];
+
+
 const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps) => {
-  const getApkDownloadUrl = () => {
-    let url = 'https://github.com/HexaGhost-09/wallora-2/releases';
-    if (latestRelease && latestRelease.assets) {
-      const generalApk = latestRelease.assets.find(asset => asset.name.includes('app-release.apk'));
-      if (generalApk) {
-        url = generalApk.browser_download_url;
-      } else {
-        const anyApk = latestRelease.assets.find(asset => asset.name.includes('.apk'));
-        if (anyApk) url = anyApk.browser_download_url;
-      }
+  const getDownloadUrl = (ext: string) => {
+    if (!latestRelease || !latestRelease.assets) return null;
+    
+    // Find asset that ends with the extension
+    const asset = latestRelease.assets.find(a => a.name.toLowerCase().endsWith(ext.toLowerCase()));
+    if (asset) {
+      return `/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`;
     }
-    if (url.includes('.apk')) {
-      return `/api/track/download?url=${encodeURIComponent(url)}`;
-    }
-    return url;
+    return null;
   };
+
 
   return (
     <section id="download" className="py-20 md:py-32 px-6 relative">
@@ -68,51 +72,91 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
             </p>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 w-full max-w-lg mx-auto"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
             {loading ? (
-              <div className="w-full bg-neutral-800 text-white font-bold py-4 px-10 rounded-2xl flex items-center justify-center gap-3 animate-pulse">
-                <Loader2 size={24} className="animate-spin" />
-                <span>Fetching latest release...</span>
+              <div className="col-span-full bg-neutral-800 text-white font-bold py-12 px-10 rounded-3xl flex flex-col items-center justify-center gap-4 animate-pulse border border-white/5">
+                <Loader2 size={32} className="animate-spin text-cyan-400" />
+                <span className="text-neutral-400">Syncing with GitHub...</span>
               </div>
             ) : error ? (
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="https://github.com/HexaGhost-09/wallora-2/releases"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-red-600/20 hover:bg-red-600/30 text-red-100 font-bold py-4 px-10 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 border border-red-500/30"
-              >
-                <span>Check GitHub Releases</span>
-              </motion.a>
+              <div className="col-span-full">
+                <motion.a
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  href="https://github.com/HexaGhost-09/wallora-2/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-red-600/10 hover:bg-red-600/20 text-red-200 font-bold py-8 px-10 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-4 border border-red-500/20"
+                >
+                  <Download size={32} />
+                  <span>Manual Download from GitHub Releases</span>
+                </motion.a>
+              </div>
             ) : (
-              <motion.a
-                whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(34, 211, 238, 0.3)' }}
-                whileTap={{ scale: 0.95 }}
-                href={getApkDownloadUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full bg-white text-black font-black py-4 sm:py-5 px-8 sm:px-12 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 text-lg sm:text-xl group"
-              >
-                <Download size={22} className="group-hover:translate-y-1 transition-transform" />
-                <span>Get Wallora {latestRelease?.tag_name ? `(${latestRelease.tag_name})` : ''}</span>
-              </motion.a>
+              <>
+                {PLATFORMS.map((platform, idx) => {
+                  const url = getDownloadUrl(platform.ext);
+                  return (
+                    <motion.div
+                      key={platform.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.1 * idx }}
+                      className="group relative"
+                    >
+                      <motion.a
+                        whileHover={url ? { y: -8, boxShadow: '0 20px 40px -20px rgba(34, 211, 238, 0.4)' } : {}}
+                        whileTap={url ? { scale: 0.95 } : {}}
+                        href={url || `https://github.com/HexaGhost-09/wallora-2/releases`}
+                        target={url ? "_blank" : "_self"}
+                        rel="noopener noreferrer"
+                        className={`h-full flex flex-col items-center justify-between p-6 rounded-3xl border transition-all duration-300 ${
+                          url 
+                            ? 'bg-white/5 border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/5' 
+                            : 'bg-neutral-900/50 border-white/5 opacity-50 cursor-not-allowed pointer-events-none'
+                        }`}
+                      >
+                        <div className="p-4 rounded-2xl bg-white/5 group-hover:bg-cyan-500/10 transition-colors mb-4">
+                          <platform.icon size={28} className={url ? 'text-white group-hover:text-cyan-400' : 'text-neutral-600'} />
+                        </div>
+                        <div className="space-y-1 text-center">
+                          <h4 className="font-bold text-white text-lg">{platform.name}</h4>
+                          <p className="text-xs font-medium text-neutral-500 uppercase tracking-widest">
+                            {url ? platform.label : 'Coming Soon'}
+                          </p>
+                        </div>
+                        <div className={`mt-6 w-full py-2.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 ${
+                          url 
+                            ? 'bg-white text-black group-hover:bg-cyan-400' 
+                            : 'bg-neutral-800 text-neutral-500'
+                        }`}>
+                          <Download size={14} />
+                          <span>{url ? 'DOWNLOAD' : 'UNAVAILABLE'}</span>
+                        </div>
+                      </motion.a>
+                    </motion.div>
+                  );
+                })}
+              </>
             )}
+          </div>
 
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.8 }}
+            className="pt-4"
+          >
             <motion.a
-              whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+              whileHover={{ scale: 1.05, color: '#fff' }}
               whileTap={{ scale: 0.95 }}
               href="/releases"
-              className="w-full inline-flex items-center justify-center gap-3 py-4 sm:py-5 px-8 sm:px-12 rounded-2xl transition-all duration-300 text-white font-bold border border-white/10 hover:border-white/20 backdrop-blur-md text-lg sm:text-xl"
+              className="inline-flex items-center gap-3 py-3 px-8 rounded-full transition-all duration-300 text-neutral-500 font-bold border border-white/5 hover:border-white/10 backdrop-blur-md text-sm uppercase tracking-widest"
             >
-              <List size={22} />
-              <span>Full Archive</span>
+              <List size={18} />
+              <span>Full Archive & Source Code</span>
             </motion.a>
           </motion.div>
         </div>
