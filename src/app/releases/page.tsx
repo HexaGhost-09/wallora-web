@@ -31,6 +31,7 @@ interface GitHubRelease {
   html_url: string;
   assets: GitHubReleaseAsset[];
   prerelease: boolean;
+  download_count?: number;
 }
 
 const formatFileSize = (bytes: number) => {
@@ -74,6 +75,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
                   {isLatest ? '⚡ Latest' : release.prerelease ? 'Pre-release' : 'Stable'}
                 </span>
                 <time className="text-xs text-neutral-500 font-medium">{formatDate(release.published_at)}</time>
+                <span className="inline-flex items-center gap-1.5 text-xs text-neutral-400 font-semibold"><Download size={12} /> {(release.download_count ?? 0).toLocaleString()} downloads</span>
               </div>
               <h3 className={`text-2xl md:text-3xl font-black tracking-tight ${isLatest ? 'text-white' : 'text-neutral-200'}`}>
                 {release.name || release.tag_name}
@@ -160,7 +162,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
             }).map(asset => (
               <a
                 key={asset.name}
-                href={`/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`}
+                href={`/api/track/download?version=${encodeURIComponent(release.tag_name)}&url=${encodeURIComponent(asset.browser_download_url)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white text-xs font-medium border border-white/5 hover:border-white/15 transition-all"
@@ -196,7 +198,21 @@ const ReleasesPage = () => {
   useEffect(() => {
     fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases')
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then((data: GitHubRelease[]) => { setReleases(data); setLoading(false); })
+      .then(async (data: GitHubRelease[]) => {
+        const statsResponse = await fetch('/api/releases/stats', { cache: 'no-store' });
+        const stats = statsResponse.ok ? await statsResponse.json() : [];
+        const counts = new Map<string, number>(
+          (Array.isArray(stats) ? stats : []).map((item: { version: string; downloads: number }) => [
+            item.version,
+            Number(item.downloads) || 0,
+          ])
+        );
+        setReleases(data.map(release => ({
+          ...release,
+          download_count: counts.get(release.tag_name) ?? 0,
+        })));
+        setLoading(false);
+      })
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 
