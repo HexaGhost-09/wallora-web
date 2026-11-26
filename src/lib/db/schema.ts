@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, boolean, integer, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),
@@ -25,8 +25,9 @@ export const apkVersions = pgTable("apk_versions", {
   downloadUrl: text("download_url").notNull(),
   releaseNotes: text("release_notes"),
   isLatest: boolean("is_latest").default(false),
+  githubDownloadCount: integer("github_download_count").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({ versionNameUnique: uniqueIndex("apk_versions_version_name_unique").on(table.versionName) }));
 
 export const downloads = pgTable("downloads", {
   id: serial("id").primaryKey(),
