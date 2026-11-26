@@ -91,7 +91,7 @@ const ReleaseCard = ({ release, index, isLatest }: { release: GitHubRelease; ind
                     key={platform.id}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    href={`/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`}
+                    href={`/api/track/download?version=${encodeURIComponent(release.tag_name)}&url=${encodeURIComponent(asset.browser_download_url)}` }
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition-all duration-300 ${isLatest ? 'bg-white text-black hover:bg-neutral-100 shadow-lg shadow-white/5' : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'}`}
