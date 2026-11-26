@@ -78,9 +78,9 @@ export async function GET(req: NextRequest) {
         && entry.type !== "folder"
       ));
 
-      if (matches.length > 0 || entries.length === 0) break;
+      if (entries.length === 0) break;
       if (listing.last_page && page >= Number(listing.last_page)) break;
-      if (listing.current_page && listing.last_page && Number(listing.current_page) >= Number(listing.last_page)) break;
+      if (!listing.last_page && entries.length < 100) break;
     }
 
     if (matches.length === 0) {
