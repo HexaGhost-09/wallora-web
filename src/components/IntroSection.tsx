@@ -26,6 +26,7 @@ const formatStars = (num: number | null) => {
 interface IntroSectionProps {
   stars: number | null;
   contributorsCount: number | null;
+  totalDownloads: number | null;
   latestRelease: GitHubRelease | null;
 }
 
