@@ -124,9 +124,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Drime returned an invalid download URL." }, { status: 502 });
     }
 
-    const downloadHeaders: HeadersInit = {};
+    const downloadHeaders = new Headers();
     if (downloadUrl.hostname === "app.drime.cloud") {
-      downloadHeaders.Authorization = `Bearer ${token}`;
+      downloadHeaders.set("Authorization", `Bearer ${token}`);
     }
 
     const fileResponse = await fetch(downloadUrl, {
