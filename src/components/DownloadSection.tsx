@@ -47,7 +47,7 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
     return `/api/track/drime-download?version=${encodeURIComponent(latestRelease.tag_name)}&filename=${encodeURIComponent(asset.name)}`;
   };
 
-    return (
+  return (
     <section id="download" className="py-20 md:py-32 px-6 relative">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-cyan-500/5 blur-[120px] -z-10" />
@@ -134,7 +134,7 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
                             }`}
                           >
                             <Download size={14} />
-                            <span>SERVER 1 · GITHUB</span>
+                            <span>SERVER 1 · GITHUB · DEFAULT</span>
                           </motion.a>
                           <motion.a
                             whileHover={drimeUrl ? { scale: 1.03 } : {}}
