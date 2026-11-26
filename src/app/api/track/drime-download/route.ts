@@ -10,8 +10,10 @@ export const dynamic = "force-dynamic";
 const DRIME_ORIGIN = "https://app.drime.cloud";
 const DRIME_API = `${DRIME_ORIGIN}/api/v1`;
 const GITHUB_RELEASES = "https://api.github.com/repos/HexaGhost-09/wallora-2/releases/tags";
+const DRIME_FOLDER = "wallora";
 
 type DrimeEntry = {
+  id?: string | number;
   name?: string;
   file_name?: string;
   hash?: string;
@@ -26,6 +28,44 @@ type DrimeListing = {
   current_page?: number;
   last_page?: number;
 };
+
+async function listDrimeEntries(token: string, folderId?: string | number): Promise<DrimeEntry[]> {
+  const allEntries: DrimeEntry[] = [];
+
+  for (let page = 1; page <= 200; page += 1) {
+    const listUrl = new URL(`${DRIME_API}/drive/file-entries`);
+    if (folderId !== undefined) listUrl.searchParams.set("folderId", String(folderId));
+    listUrl.searchParams.set("page", String(page));
+    listUrl.searchParams.set("perPage", "100");
+
+    const response = await fetch(listUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error("Drime file listing failed:", response.status, detail);
+      throw new Error(`Drime file listing failed (HTTP ${response.status})`);
+    }
+
+    const listing = await response.json() as DrimeListing;
+    const entries = Array.isArray(listing.data) ? listing.data : [];
+    allEntries.push(...entries);
+
+    const currentPage = Number(listing.current_page || page);
+    const lastPage = Number(listing.last_page || 0);
+    if (entries.length === 0 || (lastPage > 0 && currentPage >= lastPage)
+      || (lastPage === 0 && entries.length < 100)) {
+      break;
+    }
+  }
+
+  return allEntries;
+}
 
 export async function GET(req: NextRequest) {
   const version = req.nextUrl.searchParams.get("version")?.trim();
@@ -60,53 +100,29 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "File is not part of this Wallora release." }, { status: 404 });
     }
 
-    const authHeaders = {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    };
+    // Find the "wallora" folder in the Drive root, then list only its contents.
+    const rootEntries = await listDrimeEntries(token);
+    const folder = rootEntries.find((entry) =>
+      entry.type === "folder" && entry.name?.toLowerCase() === DRIME_FOLDER
+    );
 
-    // Omitting workspaceId lists the personal Drive. workspaceId=0 is not
-    // needed for the root and can cause the API to return an empty listing.
-    const matches: DrimeEntry[] = [];
-    for (let page = 1; page <= 200; page += 1) {
-      const listUrl = new URL(`${DRIME_API}/drive/file-entries`);
-      listUrl.searchParams.set("page", String(page));
-      listUrl.searchParams.set("perPage", "100");
-
-      const listResponse = await fetch(listUrl, {
-        headers: authHeaders,
-        cache: "no-store",
-      });
-
-      if (!listResponse.ok) {
-        const detail = await listResponse.text();
-        console.error("Drime file listing failed:", listResponse.status, detail);
-        return NextResponse.json(
-          { error: `Drime file listing failed (HTTP ${listResponse.status}). Check the DRIME_TOKEN Files permission.` },
-          { status: 502 }
-        );
-      }
-
-      const listing = await listResponse.json() as DrimeListing;
-      const entries = Array.isArray(listing.data) ? listing.data : [];
-
-      matches.push(...entries.filter((entry) =>
-        (entry.name === filename || entry.file_name === filename)
-        && entry.type !== "folder"
-        && entry.url
-      ));
-
-      const currentPage = Number(listing.current_page || page);
-      const lastPage = Number(listing.last_page || 0);
-      if (entries.length === 0 || (lastPage > 0 && currentPage >= lastPage)
-        || (lastPage === 0 && entries.length < 100)) {
-        break;
-      }
+    if (!folder?.id) {
+      return NextResponse.json(
+        { error: 'Folder "wallora" was not found in the root of your Drime Drive.' },
+        { status: 404 }
+      );
     }
+
+    const folderEntries = await listDrimeEntries(token, folder.id);
+    const matches = folderEntries.filter((entry) =>
+      (entry.name === filename || entry.file_name === filename)
+      && entry.type !== "folder"
+      && entry.url
+    );
 
     if (matches.length === 0) {
       return NextResponse.json(
-        { error: `File not found in the root of your Drime Drive: ${filename}` },
+        { error: `File not found inside Drime/wallora/: ${filename}` },
         { status: 404 }
       );
     }
@@ -117,8 +133,7 @@ export async function GET(req: NextRequest) {
     );
     const entry = matches[0];
 
-    // Drime returns the actual download URL in each file-entry. Use that URL;
-    // /file-entries/download/{hash} is not the download route used by Drime.
+    // Drime returns the actual download URL in each file-entry.
     const downloadUrl = new URL(entry.url!, DRIME_ORIGIN);
     if (downloadUrl.protocol !== "https:") {
       return NextResponse.json({ error: "Drime returned an invalid download URL." }, { status: 502 });
