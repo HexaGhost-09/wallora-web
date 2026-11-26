@@ -26,6 +26,7 @@ interface GitHubRelease {
 interface GitHubData {
   stars: number | null;
   contributorsCount: number | null;
+  totalDownloads: number | null;
   latestRelease: GitHubRelease | null;
   loading: boolean;
   error: boolean;
@@ -35,6 +36,7 @@ export default function HomePage() {
   const [githubData, setGithubData] = useState<GitHubData>({
     stars: null,
     contributorsCount: null,
+    totalDownloads: null,
     latestRelease: null,
     loading: true,
     error: false,
@@ -43,10 +45,11 @@ export default function HomePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [repoResponse, contributorsResponse, releaseResponse] = await Promise.all([
+        const [repoResponse, contributorsResponse, releaseResponse, statsResponse] = await Promise.all([
           fetch('https://api.github.com/repos/HexaGhost-09/wallora-2'),
           fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/contributors'),
-          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest')
+          fetch('https://api.github.com/repos/HexaGhost-09/wallora-2/releases/latest'),
+          fetch('/api/releases/stats', { cache: 'no-store' })
         ]);
 
         if (!repoResponse.ok || !contributorsResponse.ok || !releaseResponse.ok) {
@@ -56,10 +59,15 @@ export default function HomePage() {
         const repoData = await repoResponse.json();
         const contributorsData = await contributorsResponse.json();
         const releaseData = await releaseResponse.json();
+        const statsData = statsResponse.ok ? await statsResponse.json() : [];
+        const totalDownloads = Array.isArray(statsData)
+          ? statsData.reduce((total: number, item: { downloads?: number }) => total + (Number(item.downloads) || 0), 0)
+          : null;
 
         setGithubData({
           stars: repoData.stargazers_count || null,
           contributorsCount: Array.isArray(contributorsData) ? contributorsData.length : null,
+          totalDownloads,
           latestRelease: releaseData.tag_name ? releaseData : null,
           loading: false,
           error: false
@@ -78,6 +86,7 @@ export default function HomePage() {
       <IntroSection
         stars={githubData.stars}
         contributorsCount={githubData.contributorsCount}
+        totalDownloads={githubData.totalDownloads}
         latestRelease={githubData.latestRelease}
       />
       <MobileShowcaseSection />
