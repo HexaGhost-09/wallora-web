@@ -31,19 +31,23 @@ const PLATFORMS = [
 
 
 const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps) => {
+  const findAsset = (ext: string) => latestRelease?.assets?.find(
+    a => a.name.toLowerCase().endsWith(ext.toLowerCase())
+  ) ?? null;
+
   const getDownloadUrl = (ext: string) => {
-    if (!latestRelease || !latestRelease.assets) return null;
-    
-    // Find asset that ends with the extension
-    const asset = latestRelease.assets.find(a => a.name.toLowerCase().endsWith(ext.toLowerCase()));
-    if (asset) {
-      return `/api/track/download?version=${encodeURIComponent(latestRelease.tag_name)}&url=${encodeURIComponent(asset.browser_download_url)}`;
-    }
-    return null;
+    const asset = findAsset(ext);
+    if (!latestRelease || !asset) return null;
+    return `/api/track/download?version=${encodeURIComponent(latestRelease.tag_name)}&url=${encodeURIComponent(asset.browser_download_url)}`;
   };
 
+  const getDrimeDownloadUrl = (ext: string) => {
+    const asset = findAsset(ext);
+    if (!latestRelease || !asset) return null;
+    return `/api/track/drime-download?version=${encodeURIComponent(latestRelease.tag_name)}&filename=${encodeURIComponent(asset.name)}`;
+  };
 
-  return (
+    return (
     <section id="download" className="py-20 md:py-32 px-6 relative">
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-cyan-500/5 blur-[120px] -z-10" />
@@ -96,6 +100,7 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
               <>
                 {PLATFORMS.map((platform, idx) => {
                   const url = getDownloadUrl(platform.ext);
+                  const drimeUrl = getDrimeDownloadUrl(platform.ext);
                   return (
                     <motion.div
                       key={platform.id}
@@ -103,20 +108,11 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: 0.1 * idx }}
-                      className="group relative"
+                      className="group relative flex flex-col gap-2"
                     >
-                      <motion.a
-                        whileHover={url ? { y: -8, boxShadow: '0 20px 40px -20px rgba(34, 211, 238, 0.4)' } : {}}
-                        whileTap={url ? { scale: 0.95 } : {}}
-                        href={url || `https://github.com/HexaGhost-09/wallora-2/releases`}
-                        target={url ? "_blank" : "_self"}
-                        rel="noopener noreferrer"
-                        className={`h-full flex flex-col items-center justify-between p-6 rounded-3xl border transition-all duration-300 ${
-                          url 
-                            ? 'bg-white/5 border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/5' 
-                            : 'bg-neutral-900/50 border-white/5 opacity-50 cursor-not-allowed pointer-events-none'
-                        }`}
-                      >
+                      <div className={`flex flex-col items-center p-6 rounded-3xl border transition-all duration-300 ${
+                        url ? 'bg-white/5 border-white/10 hover:border-cyan-500/50 hover:bg-cyan-500/5' : 'bg-neutral-900/50 border-white/5 opacity-50'
+                      }`}>
                         <div className="p-4 rounded-2xl bg-white/5 group-hover:bg-cyan-500/10 transition-colors mb-4">
                           <platform.icon size={28} className={url ? 'text-white group-hover:text-cyan-400' : 'text-neutral-600'} />
                         </div>
@@ -126,15 +122,35 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
                             {url ? platform.label : 'Coming Soon'}
                           </p>
                         </div>
-                        <div className={`mt-6 w-full py-2.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 ${
-                          url 
-                            ? 'bg-white text-black group-hover:bg-cyan-400' 
-                            : 'bg-neutral-800 text-neutral-500'
-                        }`}>
-                          <Download size={14} />
-                          <span>{url ? 'DOWNLOAD' : 'UNAVAILABLE'}</span>
+                        <div className="mt-5 w-full flex flex-col gap-2">
+                          <motion.a
+                            whileHover={url ? { scale: 1.03 } : {}}
+                            whileTap={url ? { scale: 0.97 } : {}}
+                            href={url || 'https://github.com/HexaGhost-09/wallora-2/releases'}
+                            target={url ? "_blank" : "_self"}
+                            rel="noopener noreferrer"
+                            className={`w-full py-2.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 ${
+                              url ? 'bg-white text-black hover:bg-cyan-400' : 'bg-neutral-800 text-neutral-500'
+                            }`}
+                          >
+                            <Download size={14} />
+                            <span>SERVER 1 · GITHUB</span>
+                          </motion.a>
+                          <motion.a
+                            whileHover={drimeUrl ? { scale: 1.03 } : {}}
+                            whileTap={drimeUrl ? { scale: 0.97 } : {}}
+                            href={drimeUrl || '#'}
+                            aria-disabled={!drimeUrl}
+                            onClick={event => { if (!drimeUrl) event.preventDefault(); }}
+                            className={`w-full py-2.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-2 border ${
+                              drimeUrl ? 'bg-cyan-500/10 text-cyan-300 border-cyan-400/20 hover:bg-cyan-500/20' : 'bg-neutral-900 text-neutral-600 border-white/5 cursor-not-allowed'
+                            }`}
+                          >
+                            <Download size={14} />
+                            <span>SERVER 2 · DRIME</span>
+                          </motion.a>
                         </div>
-                      </motion.a>
+                      </div>
                     </motion.div>
                   );
                 })}
