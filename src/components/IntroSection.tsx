@@ -29,7 +29,7 @@ interface IntroSectionProps {
   latestRelease: GitHubRelease | null;
 }
 
-const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionProps) => {
+const IntroSection = ({ stars, contributorsCount, totalDownloads, latestRelease }: IntroSectionProps) => {
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -100,6 +100,23 @@ const IntroSection = ({ stars, contributorsCount, latestRelease }: IntroSectionP
               <div className="h-4 w-px bg-white/20"></div>
               <span className="font-bold text-white tracking-tight">
                 {contributorsCount !== null ? contributorsCount : '...'}
+              </span>
+            </div>
+          </motion.a>
+
+          {/* Total Downloads Badge */}
+          <motion.a
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            href="/releases"
+            className="group relative inline-flex items-center gap-3 py-2 px-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 transition-all duration-300 hover:border-white/20"
+          >
+            <Download size={18} className="text-emerald-400" />
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-neutral-400 group-hover:text-white transition-colors">Downloads</span>
+              <div className="h-4 w-px bg-white/20"></div>
+              <span className="font-bold text-white tracking-tight">
+                {totalDownloads !== null ? `${totalDownloads.toLocaleString()}+` : '...'}
               </span>
             </div>
           </motion.a>
