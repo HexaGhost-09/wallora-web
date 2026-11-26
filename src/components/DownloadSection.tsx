@@ -37,7 +37,7 @@ const DownloadSection = ({ latestRelease, loading, error }: DownloadSectionProps
     // Find asset that ends with the extension
     const asset = latestRelease.assets.find(a => a.name.toLowerCase().endsWith(ext.toLowerCase()));
     if (asset) {
-      return `/api/track/download?url=${encodeURIComponent(asset.browser_download_url)}`;
+      return `/api/track/download?version=${encodeURIComponent(latestRelease.tag_name)}&url=${encodeURIComponent(asset.browser_download_url)}`;
     }
     return null;
   };
