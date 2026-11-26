@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { desc, eq, sql } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { apkVersions, downloads } from "@/lib/db/schema";
+import { apkVersions } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -10,17 +10,16 @@ export async function GET() {
     const rows = await db
       .select({
         version: apkVersions.versionName,
-        githubDownloads: apkVersions.githubDownloadCount,
-        trackedDownloads: sql<number>`count(${downloads.id})::int`,
+        downloads: apkVersions.githubDownloadCount,
       })
       .from(apkVersions)
-      .leftJoin(downloads, eq(downloads.apkId, apkVersions.id))
-      .groupBy(apkVersions.id)
       .orderBy(desc(apkVersions.createdAt));
 
+    // Report GitHub's actual release-asset download counters only.
+    // Local website tracking is kept separately to avoid double-counting.
     return NextResponse.json(rows.map(row => ({
       version: row.version,
-      downloads: Number(row.githubDownloads || 0) + Number(row.trackedDownloads || 0),
+      downloads: Number(row.downloads || 0),
     })), {
       headers: { "Cache-Control": "no-store" },
     });
