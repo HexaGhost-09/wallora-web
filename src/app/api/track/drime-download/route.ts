@@ -7,16 +7,24 @@ import { trackDownload } from "@/lib/db/tracking";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const DRIME_API = "https://app.drime.cloud/api/v1";
+const DRIME_ORIGIN = "https://app.drime.cloud";
+const DRIME_API = `${DRIME_ORIGIN}/api/v1`;
 const GITHUB_RELEASES = "https://api.github.com/repos/HexaGhost-09/wallora-2/releases/tags";
 
 type DrimeEntry = {
   name?: string;
-  clientName?: string;
-  client_name?: string;
+  file_name?: string;
   hash?: string;
+  url?: string;
   type?: string;
   created_at?: string;
+  updated_at?: string;
+};
+
+type DrimeListing = {
+  data?: DrimeEntry[];
+  current_page?: number;
+  last_page?: number;
 };
 
 export async function GET(req: NextRequest) {
@@ -36,7 +44,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Confirm that the requested filename is a real asset in this Wallora release.
+    // Only allow downloads for assets that belong to a real Wallora release.
     const releaseResponse = await fetch(
       `${GITHUB_RELEASES}/${encodeURIComponent(version)}`,
       { headers: { Accept: "application/vnd.github+json" }, cache: "no-store" }
@@ -44,6 +52,7 @@ export async function GET(req: NextRequest) {
     if (!releaseResponse.ok) {
       return NextResponse.json({ error: "GitHub release not found." }, { status: 404 });
     }
+
     const release = await releaseResponse.json();
     const validAsset = Array.isArray(release.assets)
       && release.assets.some((asset: { name?: string }) => asset.name === filename);
@@ -51,13 +60,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "File is not part of this Wallora release." }, { status: 404 });
     }
 
-    const authHeaders = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-    const matches: DrimeEntry[] = [];
+    const authHeaders = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+    };
 
-    // Drime returns paginated file entries. Find the exact release asset name.
-    for (let page = 1; page <= 100; page += 1) {
+    // Omitting workspaceId lists the personal Drive. workspaceId=0 is not
+    // needed for the root and can cause the API to return an empty listing.
+    const matches: DrimeEntry[] = [];
+    for (let page = 1; page <= 200; page += 1) {
       const listUrl = new URL(`${DRIME_API}/drive/file-entries`);
-      listUrl.searchParams.set("workspaceId", "0");
       listUrl.searchParams.set("page", String(page));
       listUrl.searchParams.set("perPage", "100");
 
@@ -65,44 +77,71 @@ export async function GET(req: NextRequest) {
         headers: authHeaders,
         cache: "no-store",
       });
+
       if (!listResponse.ok) {
-        console.error("Drime file listing failed:", listResponse.status, await listResponse.text());
-        return NextResponse.json({ error: "Could not list files from Drime." }, { status: 502 });
+        const detail = await listResponse.text();
+        console.error("Drime file listing failed:", listResponse.status, detail);
+        return NextResponse.json(
+          { error: `Drime file listing failed (HTTP ${listResponse.status}). Check the DRIME_TOKEN Files permission.` },
+          { status: 502 }
+        );
       }
 
-      const listing = await listResponse.json();
-      const entries: DrimeEntry[] = Array.isArray(listing.data) ? listing.data : [];
+      const listing = await listResponse.json() as DrimeListing;
+      const entries = Array.isArray(listing.data) ? listing.data : [];
+
       matches.push(...entries.filter((entry) =>
-        (entry.name === filename || entry.clientName === filename || entry.client_name === filename)
-        && entry.hash
+        (entry.name === filename || entry.file_name === filename)
         && entry.type !== "folder"
+        && entry.url
       ));
 
-      if (entries.length === 0) break;
-      if (listing.last_page && page >= Number(listing.last_page)) break;
-      if (!listing.last_page && entries.length < 100) break;
+      const currentPage = Number(listing.current_page || page);
+      const lastPage = Number(listing.last_page || 0);
+      if (entries.length === 0 || (lastPage > 0 && currentPage >= lastPage)
+        || (lastPage === 0 && entries.length < 100)) {
+        break;
+      }
     }
 
     if (matches.length === 0) {
       return NextResponse.json(
-        { error: `This file has not been uploaded to Drime yet: ${filename}` },
+        { error: `File not found in the root of your Drime Drive: ${filename}` },
         { status: 404 }
       );
     }
 
-    // If the same asset name exists more than once, use the newest Drime entry.
+    // If duplicate names exist, prefer the most recently updated entry.
     matches.sort((a, b) =>
-      Date.parse(b.created_at || "") - Date.parse(a.created_at || "")
+      Date.parse(b.updated_at || b.created_at || "") - Date.parse(a.updated_at || a.created_at || "")
     );
     const entry = matches[0];
 
-    const fileResponse = await fetch(
-      `${DRIME_API}/file-entries/download/${encodeURIComponent(entry.hash!)}`,
-      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
-    );
+    // Drime returns the actual download URL in each file-entry. Use that URL;
+    // /file-entries/download/{hash} is not the download route used by Drime.
+    const downloadUrl = new URL(entry.url!, DRIME_ORIGIN);
+    if (downloadUrl.protocol !== "https:") {
+      return NextResponse.json({ error: "Drime returned an invalid download URL." }, { status: 502 });
+    }
+
+    const downloadHeaders: HeadersInit = {};
+    if (downloadUrl.hostname === "app.drime.cloud") {
+      downloadHeaders.Authorization = `Bearer ${token}`;
+    }
+
+    const fileResponse = await fetch(downloadUrl, {
+      headers: downloadHeaders,
+      cache: "no-store",
+      redirect: "follow",
+    });
+
     if (!fileResponse.ok || !fileResponse.body) {
-      console.error("Drime file download failed:", fileResponse.status, await fileResponse.text());
-      return NextResponse.json({ error: "Drime could not deliver this file." }, { status: 502 });
+      const detail = await fileResponse.text();
+      console.error("Drime file download failed:", fileResponse.status, detail);
+      return NextResponse.json(
+        { error: `Drime file download failed (HTTP ${fileResponse.status}).` },
+        { status: 502 }
+      );
     }
 
     // Store Server 2 downloads in the same Neon downloads table, tagged by source.
@@ -131,6 +170,9 @@ export async function GET(req: NextRequest) {
     return new NextResponse(fileResponse.body, { status: 200, headers });
   } catch (error) {
     console.error("Drime Server 2 download failed:", error);
-    return NextResponse.json({ error: "Failed to download file from Drime." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Drime Server 2 request failed. Check the website server logs for the Drime API error." },
+      { status: 502 }
+    );
   }
 }
