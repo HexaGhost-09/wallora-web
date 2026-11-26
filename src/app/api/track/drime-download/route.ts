@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
       const listUrl = new URL(`${DRIME_API}/drive/file-entries`);
       listUrl.searchParams.set("workspaceId", "0");
       listUrl.searchParams.set("page", String(page));
+      listUrl.searchParams.set("perPage", "100");
 
       const listResponse = await fetch(listUrl, {
         headers: authHeaders,
