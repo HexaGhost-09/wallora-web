@@ -29,12 +29,14 @@ type DrimeListing = {
   last_page?: number;
 };
 
-async function listDrimeEntries(token: string, folderId?: string | number): Promise<DrimeEntry[]> {
+async function listDrimeEntries(token: string, parentId?: string | number): Promise<DrimeEntry[]> {
   const allEntries: DrimeEntry[] = [];
 
   for (let page = 1; page <= 200; page += 1) {
     const listUrl = new URL(`${DRIME_API}/drive/file-entries`);
-    if (folderId !== undefined) listUrl.searchParams.set("folderId", String(folderId));
+    // Drime API filters folder contents with parentIds in the personal workspace.
+    listUrl.searchParams.set("workspaceId", "0");
+    if (parentId !== undefined) listUrl.searchParams.set("parentIds", String(parentId));
     listUrl.searchParams.set("page", String(page));
     listUrl.searchParams.set("perPage", "100");
 
@@ -83,6 +85,7 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  let stage = "validating GitHub release";
   try {
     // Only allow downloads for assets that belong to a real Wallora release.
     const releaseResponse = await fetch(
@@ -100,7 +103,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "File is not part of this Wallora release." }, { status: 404 });
     }
 
-    // Find the "wallora" folder in the Drive root, then list only its contents.
+    // Find the "wallora" folder in the Drime personal workspace root.
+    stage = "listing Drime root";
     const rootEntries = await listDrimeEntries(token);
     const folder = rootEntries.find((entry) =>
       entry.type === "folder" && entry.name?.toLowerCase() === DRIME_FOLDER
@@ -113,6 +117,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    stage = `listing Drime folder ${folder.id}`;
     const folderEntries = await listDrimeEntries(token, folder.id);
     const matches = folderEntries.filter((entry) =>
       (entry.name === filename || entry.file_name === filename)
@@ -144,6 +149,7 @@ export async function GET(req: NextRequest) {
       downloadHeaders.set("Authorization", `Bearer ${token}`);
     }
 
+    stage = `downloading Drime file ${filename}`;
     const fileResponse = await fetch(downloadUrl, {
       headers: downloadHeaders,
       cache: "no-store",
@@ -184,7 +190,7 @@ export async function GET(req: NextRequest) {
 
     return new NextResponse(fileResponse.body, { status: 200, headers });
   } catch (error) {
-    console.error("Drime Server 2 download failed:", error);
+    console.error(`Drime Server 2 download failed during ${stage}:`, error);
     return NextResponse.json(
       { error: "Drime Server 2 request failed. Check the website server logs for the Drime API error." },
       { status: 502 }
