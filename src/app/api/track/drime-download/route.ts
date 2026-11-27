@@ -117,8 +117,22 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    stage = `listing Drime folder ${folder.id}`;
-    const folderEntries = await listDrimeEntries(token, folder.id);
+    const releaseFolderName = version.replace(/^v/i, "");
+    stage = `listing Drime release folder ${releaseFolderName}`;
+    const walloraEntries = await listDrimeEntries(token, folder.id);
+    const releaseFolder = walloraEntries.find((entry) =>
+      entry.type === "folder" && entry.name?.toLowerCase() === releaseFolderName.toLowerCase()
+    );
+
+    if (!releaseFolder?.id) {
+      return NextResponse.json(
+        { error: `Release folder "${releaseFolderName}" was not found inside Drime/wallora/.` },
+        { status: 404 }
+      );
+    }
+
+    stage = `listing Drime version folder ${releaseFolder.id}`;
+    const folderEntries = await listDrimeEntries(token, releaseFolder.id);
     const matches = folderEntries.filter((entry) =>
       (entry.name === filename || entry.file_name === filename)
       && entry.type !== "folder"
