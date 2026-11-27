@@ -190,9 +190,14 @@ export async function GET(req: NextRequest) {
 
     return new NextResponse(fileResponse.body, { status: 200, headers });
   } catch (error) {
-    console.error(`Drime Server 2 download failed during ${stage}:`, error);
+    const detail = error instanceof Error ? error.message : String(error);
+    console.error(`Drime Server 2 download failed during ${stage}:`, detail);
     return NextResponse.json(
-      { error: "Drime Server 2 request failed. Check the website server logs for the Drime API error." },
+      {
+        error: "Drime Server 2 request failed.",
+        stage,
+        detail,
+      },
       { status: 502 }
     );
   }
